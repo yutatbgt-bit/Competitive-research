@@ -515,28 +515,13 @@ def main():
     os.makedirs(os.path.dirname(pptx_path), exist_ok=True)
     create_presentation(sections, pptx_path, map_image_path)
     
-    # PPTX生成完了後、スライド埋め込み用の一時マップ画像を削除（成果物をPPTXとHTMLの2点にするため）
+    # PPTX生成完了後、スライド埋め込み用の一時マップ画像を削除
     if os.path.exists(map_image_path):
         try:
             os.remove(map_image_path)
             print(f"Temporary map image deleted: {map_image_path}")
         except OSError:
             pass
-
-    # その他の「生成時に作成・使用した一時ファイル」も2つの最終成果物が完成した後に削除する仕様
-    temp_files = [
-        md_path,
-        "dashboard_template.html",
-        db_path,
-        "report_instruction.md"
-    ]
-    for temp_file in temp_files:
-        if os.path.exists(temp_file):
-            try:
-                os.remove(temp_file)
-                print(f"Temporary file deleted: {temp_file}")
-            except OSError as e:
-                print(f"Failed to delete {temp_file}: {e}")
 
 if __name__ == "__main__":
     main()
