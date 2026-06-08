@@ -135,15 +135,15 @@ def generate_visual_map(output_path, ikari_stores, competitors):
     for name, (lat, lon) in ikari_stores.items():
         px, py = get_pixel_coords(lat, lon)
         r = 10
-        # ダークグレー外枠 (視認性確保)
-        draw.ellipse([px-r-2, py-r-2, px+r+2, py+r+2], fill=(51, 51, 51))
-        # イエロー丸
-        draw.ellipse([px-r, py-r, px+r, py+r], fill=(255, 204, 0))
+        # ゴールド外枠
+        draw.ellipse([px-r-2, py-r-2, px+r+2, py+r+2], fill=(212, 175, 55))
+        # 深緑丸
+        draw.ellipse([px-r, py-r, px+r, py+r], fill=(0, 70, 40))
         # テキストラベル背景
         text_w = draw.textlength(name, font=font_bold)
-        draw.rectangle([px - text_w/2 - 4, py - r - 20, px + text_w/2 + 4, py - r - 3], fill=(255, 255, 255), outline=(51, 51, 51), width=1)
-        # ラベル描画 (文字はダークグレー)
-        draw.text((px, py - r - 19), name, fill=(51, 51, 51), font=font_bold, anchor="ma")
+        draw.rectangle([px - text_w/2 - 4, py - r - 20, px + text_w/2 + 4, py - r - 3], fill=(255, 255, 255), outline=(0, 70, 40), width=1)
+        # ラベル描画
+        draw.text((px, py - r - 19), name, fill=(0, 70, 40), font=font_bold, anchor="ma")
 
     # 競合店舗を描画 (赤: ヤマダ、オレンジ: その他)
     for name, (lat, lon) in competitors.items():
