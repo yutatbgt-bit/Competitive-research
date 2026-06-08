@@ -246,7 +246,7 @@
     function initMap() {
       if(!STORES_DATA) return;
       for (const [name, info] of Object.entries(STORES_DATA.ikari_stores || {})) {
-        const marker = L.circleMarker(info.coords, { radius: 11, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 0.95 }).addTo(map);
+        const marker = L.circleMarker(info.coords, { radius: 11, fillColor: '#ffcc00', color: '#333333', weight: 2, fillOpacity: 0.95 }).addTo(map);
         marker.bindTooltip(name, { permanent: false, direction: 'top' });
         marker.on('click', () => selectStoreFromMap(name, 'ikari'));
         activeMarkers['ikari_' + name] = marker;
