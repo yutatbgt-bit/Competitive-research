@@ -524,5 +524,16 @@ def main():
         except OSError:
             pass
 
+    # レポート生成の最終成功日を記録
+    try:
+        from datetime import datetime
+        last_success_path = os.path.join(os.path.dirname(pptx_path), "last_success.txt")
+        with open(last_success_path, "w", encoding="utf-8") as f:
+            f.write(datetime.now().strftime("%Y-%m-%d"))
+        print(f"Last success date written to: {last_success_path}")
+    except Exception as e:
+        print(f"Error writing last success file: {e}")
+
+
 if __name__ == "__main__":
     main()
