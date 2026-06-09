@@ -38,7 +38,8 @@ def parse_markdown(file_path):
             sections['details_rows'] = rows[1:]
             
     # 地図的分析
-    map_match = re.search(r"## c\) 【地図的分析】\n(.*?)(?=\n## d\)|$)", content, re.DOTALL)
+    map_match = re.search(r"## c\) 【地図(?:的)?分析】\n(.*?)(?=\n## d\)|$)", content, re.DOTALL)
+
     if map_match:
         sections['map_analysis'] = map_match.group(1).strip()
         
