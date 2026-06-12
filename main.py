@@ -482,11 +482,13 @@ def create_presentation(sections, output_path, map_image_path):
 
 def main():
     import json
+    from datetime import datetime
     
+    today_str = datetime.today().strftime("%Y_%m_%d")
     md_path = "competitive_report_2026_06.md"
-    pptx_path = "report/2026_06_08_competitive_report.pptx"
-    map_image_path = "report/2026_06_08_competitive_map.png"
-    map_html_path = "report/2026_06_08_competitive_map.html"
+    pptx_path = f"report/{today_str}_competitive_report.pptx"
+    map_image_path = f"report/{today_str}_competitive_map.png"
+    map_html_path = f"report/{today_str}_competitive_map.html"
     db_path = "stores_db.json"
     
     if not os.path.exists(md_path):
