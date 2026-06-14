@@ -485,7 +485,7 @@ def main():
     from datetime import datetime
     
     today_str = datetime.today().strftime("%Y_%m_%d")
-    md_path = "competitive_report_2026_06.md"
+    md_path = "competitive_report.md"
     pptx_path = f"report/{today_str}_competitive_report.pptx"
     map_image_path = f"report/{today_str}_competitive_map.png"
     map_html_path = f"report/{today_str}_competitive_map.html"
