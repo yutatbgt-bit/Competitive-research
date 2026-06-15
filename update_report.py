@@ -1,5 +1,4 @@
 import os
-import shutil
 from datetime import datetime
 from dotenv import load_dotenv
 from google import genai
@@ -14,9 +13,7 @@ def generate_report():
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         print("Warning: GEMINI_API_KEY not found in .env. Skipping LLM generation.")
-        print("Falling back to copying the previous report structure...")
-        if os.path.exists("competitive_report_2026_06.md"):
-            shutil.copy("competitive_report_2026_06.md", "competitive_report.md")
+        print("Falling back: keeping the previous competitive_report.md as-is.")
         return
 
     client = genai.Client(api_key=api_key)
@@ -96,9 +93,7 @@ Google検索を使って、以下のキーワードに関連する最新のニ�
 
     except Exception as e:
         print(f"Error calling Gemini API: {e}")
-        # フォールバック: 前回のレポートをコピー
-        if os.path.exists("competitive_report_2026_06.md"):
-            shutil.copy("competitive_report_2026_06.md", "competitive_report.md")
+        print("Falling back: keeping the previous competitive_report.md as-is.")
 
 
 if __name__ == "__main__":
