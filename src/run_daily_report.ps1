@@ -48,7 +48,7 @@ if (-not $networkReady) {
 }
 
 Write-Log "Online detected. Updating report via AI..."
-$updateProcess = Start-Process -FilePath "uv" -ArgumentList "run update_report.py" -WorkingDirectory $workDir -NoNewWindow -PassThru -Wait
+$updateProcess = Start-Process -FilePath "uv" -ArgumentList "run src/update_report.py" -WorkingDirectory $workDir -NoNewWindow -PassThru -Wait
 if ($updateProcess.ExitCode -ne 0) {
     Write-Log "Warning: update_report.py failed. Proceeding with main.py anyway."
 }
@@ -56,7 +56,7 @@ if ($updateProcess.ExitCode -ne 0) {
 Write-Log "Running main.py..."
 
 # 3. レポート作成
-$process = Start-Process -FilePath "uv" -ArgumentList "run main.py" -WorkingDirectory $workDir -NoNewWindow -PassThru -Wait
+$process = Start-Process -FilePath "uv" -ArgumentList "run src/main.py" -WorkingDirectory $workDir -NoNewWindow -PassThru -Wait
 
 if ($process.ExitCode -eq 0) {
     Write-Log "Report generated successfully. Committing to Git..."
