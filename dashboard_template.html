@@ -284,6 +284,48 @@
     function initData() {
       if(!REPORT_DATA) return;
       
+      if(REPORT_DATA.no_update) {
+        // 1. 結論
+        document.getElementById('conclusion-text').innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+            <i class="fa-solid fa-circle-info" style="font-size: 48px; color: var(--accent); margin-bottom: 15px; display: block;"></i>
+            <p style="font-size: 16px; font-weight: 600;">本日の調査において、前日からの周辺環境（競合の新規出店・改装計画・その他動向）の更新情報はありませんでした。</p>
+            <p style="font-size: 13px; margin-top: 8px;">過去に登録された競合店およびいかりスーパーの位置関係は右側のマップで確認できます。</p>
+          </div>
+        `;
+        
+        // 2. スタッツ
+        document.getElementById('stat-open').innerText = "0";
+        document.getElementById('stat-close').innerText = "0";
+        document.getElementById('stat-rest').innerText = "0";
+        
+        // 3. テーブルヘッダとボディ
+        document.getElementById('table-headers-tr').innerHTML = `<th>地域</th><th>店舗名</th><th>時期</th><th>状態</th><th>影響</th><th>詳細</th>`;
+        document.getElementById('table-body').innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted); font-weight: 500;">
+              更新された競合情報はありません
+            </td>
+          </tr>
+        `;
+        
+        // 4. 影響分析
+        document.getElementById('influence-cards-container').innerHTML = `
+          <div style="background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 30px; text-align: center; color: var(--text-muted);">
+            <p style="font-weight: 600;">影響を受ける店舗はありません</p>
+            <p style="font-size: 12px; margin-top: 5px;">本日の周辺環境更新情報が無いか、または現在影響分析すべき新規の競合動向がありません。</p>
+          </div>
+        `;
+        
+        // 5. 参照ソース
+        document.getElementById('sources-container').innerHTML = `
+          <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+            新規の参照ソースニュースはありません
+          </div>
+        `;
+        return;
+      }
+      
       // Conclusion
       if(REPORT_DATA.conclusion) {
         document.getElementById('conclusion-text').innerHTML = REPORT_DATA.conclusion.split('\n').map(l => `<p style="margin-bottom:8px;"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>${l.replace(/^[*\\-]\s*/, '')}</p>`).join('');

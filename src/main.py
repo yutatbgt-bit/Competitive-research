@@ -17,6 +17,11 @@ def parse_markdown(file_path):
     
     sections = {}
     
+    # 「更新情報無し」が含まれるか、空の場合は早期リターン
+    if "更新情報無し" in content or not content.strip():
+        sections['no_update'] = True
+        return sections
+        
     # 結論
     conclusion_match = re.search(r"## a\) 【結論】\n(.*?)(?=\n## b\)|$)", content, re.DOTALL)
     if conclusion_match:
@@ -262,6 +267,30 @@ def create_presentation(sections, output_path, map_image_path):
     p2.alignment = PP_ALIGN.CENTER
     p2.space_before = Pt(20)
     
+    # 「更新情報無し」の場合の処理
+    if sections.get('no_update'):
+        slide = prs.slides.add_slide(prs.slide_layouts[6])
+        title_box = slide.shapes.add_textbox(Inches(0.75), Inches(0.5), Inches(11.83), Inches(0.8))
+        title_box.text_frame.word_wrap = True
+        p = title_box.text_frame.paragraphs[0]
+        p.text = "周辺環境の更新情報について"
+        p.font.bold = True
+        p.font.size = Pt(28)
+        p.font.color.rgb = DARK_GREEN
+        
+        content_box = slide.shapes.add_textbox(Inches(0.75), Inches(2.5), Inches(11.83), Inches(3.0))
+        tf_content = content_box.text_frame
+        tf_content.word_wrap = True
+        p_item = tf_content.paragraphs[0]
+        p_item.text = "本日の調査において、前日からの周辺環境（競合の新規出店・改装計画・その他動向）の更新情報はありませんでした。"
+        p_item.font.size = Pt(20)
+        p_item.font.color.rgb = BLACK
+        p_item.alignment = PP_ALIGN.CENTER
+        
+        prs.save(output_path)
+        print(f"Presentation saved (No Updates) to: {output_path}")
+        return
+        
     # 2. 結論スライド
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     title_box = slide.shapes.add_textbox(Inches(0.75), Inches(0.5), Inches(11.83), Inches(0.8))
@@ -507,14 +536,18 @@ def main():
     ikari_stores = {name: tuple(info["coords"]) for name, info in db_data.get("ikari_stores", {}).items()}
     competitors = {name: tuple(info["coords"]) for name, info in db_data.get("competitors", {}).items()}
     
+    # 0. Markdown解析
+    sections = parse_markdown(md_path)
+
     # 1. OpenStreetMapマージによる高精度な背景地図画像の自動生成
-    generate_visual_map(map_image_path, ikari_stores, competitors)
+    # (更新情報がある場合のみ、スライド用のビジュアルマップ画像を生成)
+    if not sections.get('no_update'):
+        generate_visual_map(map_image_path, ikari_stores, competitors)
     
     # 2. レポート統合型HTMLダッシュボードの自動生成
     generate_dynamic_web_page(map_html_path, db_path, md_path, "dashboard_template.html")
     
-    # 3. Markdown解析とPowerPoint生成（地図画像をスライドに挿入）
-    sections = parse_markdown(md_path)
+    # 3. PowerPoint生成（地図画像をスライドに挿入）
     os.makedirs(os.path.dirname(pptx_path), exist_ok=True)
     create_presentation(sections, pptx_path, map_image_path)
     
