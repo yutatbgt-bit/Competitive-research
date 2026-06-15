@@ -2,7 +2,7 @@
 # タスクスケジューラから毎日AM5時（または遅延起動時）に呼び出されます。
 $ErrorActionPreference = "Stop"
 
-$workDir = "C:\Users\yutat\Documents\antigravity\agitated-galileo"
+$workDir = "C:\Users\yutat\Documents\antigravity\Competitive-research"
 Set-Location $workDir
 
 $logFile = Join-Path $workDir "report\auto_runner.log"
