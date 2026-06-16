@@ -241,22 +241,113 @@
       attribution: '&copy; <a href="https://www.google.com/maps" target="_blank">Google Maps</a>', maxZoom: 20
     }).addTo(map);
 
+    // 2点間の距離(km)を計算する関数
+    function getDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371.0;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
     let activeMarkers = {};
 
     function initMap() {
       if(!STORES_DATA) return;
-      for (const [name, info] of Object.entries(STORES_DATA.ikari_stores || {})) {
+      
+      // 1. 今回のレポートで言及された競合名リストの作成
+      const mentionedComps = [];
+      if (REPORT_DATA && REPORT_DATA.details_rows) {
+        REPORT_DATA.details_rows.forEach(row => {
+          if (row.length > 1) {
+            mentionedComps.push(row[1]);
+          }
+        });
+      }
+      
+      // 2. 競合店舗のフィルタリングとプロット
+      const plotCompetitors = {};
+      for (const [name, info] of Object.entries(STORES_DATA.competitors || {})) {
+        const cleanDbName = name.split('\n')[0].replace("店", "").replace("(仮称)", "").replace("（仮称）", "").trim();
+        let isMentioned = false;
+        
+        if (REPORT_DATA.no_update) {
+          isMentioned = false;
+        } else {
+          isMentioned = mentionedComps.some(mName => {
+            const cleanMName = mName.replace("店", "").replace("(仮称)", "").replace("（仮称）", "").trim();
+            return cleanDbName.includes(cleanMName) || cleanMName.includes(cleanDbName);
+          });
+        }
+        
+        if (isMentioned) {
+          plotCompetitors[name] = info;
+        }
+      }
+      
+      // 3. 2km以内のいかり店舗の判定
+      const plotIkari = {};
+      const compKeys = Object.keys(plotCompetitors);
+      
+      if (compKeys.length > 0) {
+        for (const [ikariName, ikariInfo] of Object.entries(STORES_DATA.ikari_stores || {})) {
+          let isNearby = false;
+          for (const compName of compKeys) {
+            const compInfo = plotCompetitors[compName];
+            const dist = getDistance(ikariInfo.coords[0], ikariInfo.coords[1], compInfo.coords[0], compInfo.coords[1]);
+            if (dist <= 2.0) {
+              isNearby = true;
+              break;
+            }
+          }
+          if (isNearby) {
+            plotIkari[ikariName] = ikariInfo;
+          }
+        }
+      } else {
+        // 更新情報無し、または対象競合が無い場合は、デフォルトでいかり全店を表示
+        Object.assign(plotIkari, STORES_DATA.ikari_stores || {});
+      }
+      
+      // 4. マップ上にいかり店舗をプロット
+      for (const [name, info] of Object.entries(plotIkari)) {
         const marker = L.circleMarker(info.coords, { radius: 11, fillColor: '#004628', color: '#C5A059', weight: 2, fillOpacity: 0.95 }).addTo(map);
         marker.bindTooltip(name, { permanent: false, direction: 'top' });
         marker.on('click', () => selectStoreFromMap(name, 'ikari'));
         activeMarkers['ikari_' + name] = marker;
       }
-      for (const [name, info] of Object.entries(STORES_DATA.competitors || {})) {
+      
+      // 5. マップ上に競合店舗をプロット + 半径2kmサークルを描画
+      for (const [name, info] of Object.entries(plotCompetitors)) {
         const fillColor = name.includes('ヤマダ') ? '#ff3b30' : '#ff9f0a';
+        
+        // 半径2km（2000m）の半透明サークルを描画
+        L.circle(info.coords, {
+          radius: 2000,
+          color: fillColor,
+          fillColor: fillColor,
+          fillOpacity: 0.08,
+          weight: 1.5,
+          dashArray: '5, 5'
+        }).addTo(map);
+        
         const marker = L.circleMarker(info.coords, { radius: 9, fillColor: fillColor, color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(map);
         marker.bindTooltip(name, { permanent: false, direction: 'top' });
         marker.on('click', () => selectStoreFromMap(name, 'comp'));
         activeMarkers['comp_' + name] = marker;
+      }
+      
+      // 6. 地図の自動ズーム/センタリング調整
+      const allCoords = [];
+      Object.values(plotIkari).forEach(info => allCoords.push(info.coords));
+      Object.values(plotCompetitors).forEach(info => allCoords.push(info.coords));
+      if (allCoords.length > 0) {
+        const bounds = L.latLngBounds(allCoords);
+        map.fitBounds(bounds, { padding: [50, 50] });
       }
     }
 

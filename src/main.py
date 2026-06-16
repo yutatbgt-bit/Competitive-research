@@ -115,16 +115,104 @@ def get_map_image_from_osm(lat_min, lat_max, lon_min, lon_max, zoom=13):
 
     return map_img, get_pixel_coords
 
+def haversine_distance(lat1, lon1, lat2, lon2):
+    """
+    緯度経度から2点間のハバース距離(km)を計算する
+    """
+    R = 6371.0
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_phi / 2.0)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2.0)**2
+    c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+    return R * c
+
+def filter_stores_for_map(sections, db_data):
+    """
+    レポートに掲載された競合店と、その半径2km以内のいかりスーパー店舗のみを抽出する
+    """
+    details_rows = sections.get('details_rows', [])
+    mentioned_names = [row[1] for row in details_rows if len(row) > 1]
+    
+    ikari_all = {name: tuple(info["coords"]) for name, info in db_data.get("ikari_stores", {}).items()}
+    competitors_all = {name: tuple(info["coords"]) for name, info in db_data.get("competitors", {}).items()}
+    
+    filtered_competitors = {}
+    filtered_ikari = {}
+    
+    for comp_db_name, comp_coords in competitors_all.items():
+        clean_db_name = comp_db_name.split('\n')[0].replace("店", "").replace("(仮称)", "").replace("（仮称）", "").strip()
+        is_mentioned = False
+        for name in mentioned_names:
+            clean_mentioned = name.replace("店", "").replace("(仮称)", "").replace("（仮称）", "").strip()
+            if clean_db_name in clean_mentioned or clean_mentioned in clean_db_name:
+                is_mentioned = True
+                break
+                
+        if is_mentioned:
+            # 半径2km以内にいかりスーパーがあるか判定
+            nearby_ikari = {}
+            for ikari_name, ikari_coords in ikari_all.items():
+                dist = haversine_distance(comp_coords[0], comp_coords[1], ikari_coords[0], ikari_coords[1])
+                if dist <= 2.0:
+                    nearby_ikari[ikari_name] = ikari_coords
+            
+            # いかりスーパーが半径2km以内にある競合、およびそのいかり店舗のみを対象とする
+            if len(nearby_ikari) > 0:
+                filtered_competitors[comp_db_name] = comp_coords
+                for k, v in nearby_ikari.items():
+                    filtered_ikari[k] = v
+                    
+    # 該当店舗がない（または更新情報無しなどの）場合は、デフォルトでいかりスーパー全店を表示
+    if not filtered_competitors:
+        filtered_ikari = ikari_all
+        
+    return filtered_ikari, filtered_competitors
+
 def generate_visual_map(output_path, ikari_stores, competitors):
     """
     OpenStreetMapを背景にマージした正確な店舗位置関係画像を自動生成する
     """
-    # 阪神間エリアを最適にカバーする緯度経度範囲
-    lat_min, lat_max = 34.710, 34.815
-    lon_min, lon_max = 135.315, 135.425
+    coords = []
+    for latlon in ikari_stores.values():
+        coords.append(latlon)
+    for latlon in competitors.values():
+        coords.append(latlon)
+        
+    if len(coords) > 0:
+        lats = [c[0] for c in coords]
+        lons = [c[1] for c in coords]
+        # スパンに応じてマージンを動的に調整
+        lat_span = max(lats) - min(lats)
+        lon_span = max(lons) - min(lons)
+        max_span = max(lat_span, lon_span)
+        
+        # スパンに応じてズームとマージンを自動調整
+        if max_span > 0.4:
+            zoom = 10
+            lat_margin, lon_margin = 0.05, 0.07
+        elif max_span > 0.15:
+            zoom = 11
+            lat_margin, lon_margin = 0.03, 0.04
+        elif max_span > 0.06:
+            zoom = 12
+            lat_margin, lon_margin = 0.02, 0.025
+        else:
+            zoom = 13
+            lat_margin, lon_margin = 0.015, 0.020
+            
+        lat_min, lat_max = min(lats) - lat_margin, max(lats) + lat_margin
+        lon_min, lon_max = min(lons) - lon_margin, max(lons) + lon_margin
+    else:
+        # デフォルトの阪神間エリア範囲
+        lat_min, lat_max = 34.710, 34.815
+        lon_min, lon_max = 135.315, 135.425
+        zoom = 13
     
-    # 1. 地図画像ロード
-    map_img, get_pixel_coords = get_map_image_from_osm(lat_min, lat_max, lon_min, lon_max, zoom=13)
+    # 1. 地図画像ロード (動的に算出した zoom を渡す)
+    map_img, get_pixel_coords = get_map_image_from_osm(lat_min, lat_max, lon_min, lon_max, zoom=zoom)
     
     # 2. マーカー描画
     draw = ImageDraw.Draw(map_img)
@@ -542,7 +630,8 @@ def main():
     # 1. OpenStreetMapマージによる高精度な背景地図画像の自動生成
     # (更新情報がある場合のみ、スライド用のビジュアルマップ画像を生成)
     if not sections.get('no_update'):
-        generate_visual_map(map_image_path, ikari_stores, competitors)
+        filtered_ikari, filtered_comp = filter_stores_for_map(sections, db_data)
+        generate_visual_map(map_image_path, filtered_ikari, filtered_comp)
     
     # 2. レポート統合型HTMLダッシュボードの自動生成
     generate_dynamic_web_page(map_html_path, db_path, md_path, "dashboard_template.html")
