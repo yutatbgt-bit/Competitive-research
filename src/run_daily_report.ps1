@@ -44,13 +44,14 @@ for ($i = 0; $i -lt 60; $i++) {
 
 if (-not $networkReady) {
     Write-Log "Failed to connect to network after 10 minutes. Exiting."
-    exit
+    exit 1
 }
 
 Write-Log "Online detected. Updating report via AI..."
 $updateProcess = Start-Process -FilePath "uv" -ArgumentList "run src/update_report.py" -WorkingDirectory $workDir -NoNewWindow -PassThru -Wait
 if ($updateProcess.ExitCode -ne 0) {
-    Write-Log "Warning: update_report.py failed. Proceeding with main.py anyway."
+    Write-Log "Error: update_report.py failed with exit code $($updateProcess.ExitCode). Exiting."
+    exit 1
 }
 
 Write-Log "Running main.py..."
@@ -68,4 +69,5 @@ if ($process.ExitCode -eq 0) {
     Write-Log "Git commit completed. Exiting."
 } else {
     Write-Log "Error: uv run main.py failed with exit code $($process.ExitCode)."
+    exit 1
 }
