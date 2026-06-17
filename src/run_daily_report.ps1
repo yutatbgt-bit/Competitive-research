@@ -63,7 +63,7 @@ if ($process.ExitCode -eq 0) {
     Write-Log "Report generated successfully. Committing to Git..."
     
     # 以前の特定日付ハードコードのバグを修正し、生成された全ファイルを動的に追加
-    & git add report/
+    & git add competitive_report.md report/
     & git commit -m "chore: automatic daily report generation"
     
     Write-Log "Git commit completed. Exiting."
