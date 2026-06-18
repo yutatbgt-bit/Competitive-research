@@ -570,9 +570,20 @@ def create_presentation(sections, output_path, map_image_path):
         match = re.search(r"\[([^\]]+)\]\((https?://[^\)]+)\)", item)
         if match:
             start, end = match.span()
-            before = item[:start]
-            title = match.group(1)
+            link_text = match.group(1)
             url = match.group(2)
+            
+            # リンクの表記テキスト自体がURLで、その手前にテキストが存在する場合、
+            # 手前のテキストをリンクタイトルとして流用する
+            if (link_text.startswith("http://") or link_text.startswith("https://")) and start > 0:
+                title = item[:start].strip().rstrip(".").rstrip("。").strip()
+                if not title:
+                    title = link_text
+                before = ""
+            else:
+                title = link_text
+                before = item[:start]
+                
             after = item[end:]
             
             if before:

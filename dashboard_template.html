@@ -554,9 +554,19 @@
           let title = cleanLine;
           let linkHtml = '';
           if (match) {
-            title = match[1];
+            const linkText = match[1];
             const url = match[2];
             const safeUrl = (url.startsWith('http://') || url.startsWith('https://')) ? encodeURI(url) : '#';
+            
+            // リンクの表記テキスト自体がURLで、その手前にテキストが存在する場合、
+            // 手前のテキストをリンクタイトルとして流用する
+            const matchIndex = cleanLine.indexOf(match[0]);
+            if ((linkText.startsWith('http://') || linkText.startsWith('https://')) && matchIndex > 0) {
+              title = cleanLine.substring(0, matchIndex).trim().replace(/[.\s。]+$/, '');
+            } else {
+              title = linkText;
+            }
+            
             linkHtml = `<div class="source-links"><a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> 記事を読む</a></div>`;
           }
           return `
