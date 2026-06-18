@@ -129,6 +129,18 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
     return R * c
 
+def normalize_store_name(name):
+    """
+    店舗名を比較用に正規化する（スーパー特有の名詞や広域の都市名、店表記、括弧を除去）
+    """
+    name = name.split('\n')[0]
+    for word in ["スーパー", "ストアー", "ストア", "マーケット", "百貨店", "店", "(仮称)", "（仮称）", "大阪", "兵庫", "京都", "神戸"]:
+        name = name.replace(word, "")
+    # 空白を除去
+    import re
+    name = re.sub(r'[\s　]', '', name)
+    return name
+
 def filter_stores_for_map(sections, db_data):
     """
     レポートに掲載された競合店と、その半径2km以内のいかりスーパー店舗のみを抽出する
@@ -143,11 +155,11 @@ def filter_stores_for_map(sections, db_data):
     filtered_ikari = {}
     
     for comp_db_name, comp_coords in competitors_all.items():
-        clean_db_name = comp_db_name.split('\n')[0].replace("店", "").replace("(仮称)", "").replace("（仮称）", "").strip()
+        norm_db = normalize_store_name(comp_db_name)
         is_mentioned = False
         for name in mentioned_names:
-            clean_mentioned = name.replace("店", "").replace("(仮称)", "").replace("（仮称）", "").strip()
-            if clean_db_name in clean_mentioned or clean_mentioned in clean_db_name:
+            norm_mentioned = normalize_store_name(name)
+            if norm_db in norm_mentioned or norm_mentioned in norm_db:
                 is_mentioned = True
                 break
                 
@@ -170,6 +182,7 @@ def filter_stores_for_map(sections, db_data):
         filtered_ikari = ikari_all
         
     return filtered_ikari, filtered_competitors
+
 
 def generate_visual_map(output_path, ikari_stores, competitors):
     """

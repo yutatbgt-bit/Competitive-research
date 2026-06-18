@@ -653,17 +653,27 @@
       }
       
       // 2. 競合店舗のフィルタリングとプロット
+      function normalizeStoreName(str) {
+        if (!str) return "";
+        let s = str.split('\n')[0];
+        const words = ["スーパー", "ストアー", "ストア", "マーケット", "百貨店", "店", "(仮称)", "（仮称）", "大阪", "兵庫", "京都", "神戸"];
+        words.forEach(w => {
+          s = s.split(w).join("");
+        });
+        return s.replace(/[\s　]/g, "");
+      }
+
       const plotCompetitors = {};
       for (const [name, info] of Object.entries(STORES_DATA.competitors || {})) {
-        const cleanDbName = name.split('\n')[0].replace("店", "").replace("(仮称)", "").replace("（仮称）", "").trim();
         let isMentioned = false;
         
         if (REPORT_DATA.no_update) {
           isMentioned = false;
         } else {
           isMentioned = mentionedComps.some(mName => {
-            const cleanMName = mName.replace("店", "").replace("(仮称)", "").replace("（仮称）", "").trim();
-            return cleanDbName.includes(cleanMName) || cleanMName.includes(cleanDbName);
+            const normDb = normalizeStoreName(name);
+            const normM = normalizeStoreName(mName);
+            return normDb.includes(normM) || normM.includes(normDb);
           });
         }
         
