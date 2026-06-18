@@ -475,12 +475,24 @@
 
       // Sources
       if(REPORT_DATA.sources) {
-        document.getElementById('sources-container').innerHTML = REPORT_DATA.sources.split('\n').filter(l => l.trim()).map((l, i) => `
-          <div class="source-card">
-            <div class="source-num">Source #${i+1}</div>
-            <div class="source-title">${l.replace(/^[*\\-]\s*/, '')}</div>
-          </div>
-        `).join('');
+        document.getElementById('sources-container').innerHTML = REPORT_DATA.sources.split('\n').filter(l => l.trim()).map((l, i) => {
+          const cleanLine = l.replace(/^[*\\-]\s*/, '').trim();
+          const match = cleanLine.match(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/);
+          let title = cleanLine;
+          let linkHtml = '';
+          if (match) {
+            title = match[1];
+            const url = match[2];
+            linkHtml = `<div class="source-links"><a href="${url}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> 記事を読む</a></div>`;
+          }
+          return `
+            <div class="source-card">
+              <div class="source-num">Source #${i+1}</div>
+              <div class="source-title">${title}</div>
+              ${linkHtml}
+            </div>
+          `;
+        }).join('');
       }
     }
 

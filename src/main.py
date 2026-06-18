@@ -559,10 +559,46 @@ def create_presentation(sections, output_path, map_image_path):
     
     for idx, item in enumerate(sources_lines):
         p_item = tf_content.add_paragraph() if idx > 0 else tf_content.paragraphs[0]
-        p_item.text = "・ " + item
-        p_item.font.size = Pt(12)
-        p_item.font.color.rgb = BLACK
         p_item.space_after = Pt(8)
+        
+        # '・ ' を先頭に追加
+        run_bullet = p_item.add_run()
+        run_bullet.text = "・ "
+        run_bullet.font.size = Pt(12)
+        run_bullet.font.color.rgb = BLACK
+        
+        match = re.search(r"\[([^\]]+)\]\((https?://[^\)]+)\)", item)
+        if match:
+            start, end = match.span()
+            before = item[:start]
+            title = match.group(1)
+            url = match.group(2)
+            after = item[end:]
+            
+            if before:
+                run_before = p_item.add_run()
+                run_before.text = before
+                run_before.font.size = Pt(12)
+                run_before.font.color.rgb = BLACK
+                
+            run_link = p_item.add_run()
+            run_link.text = title
+            run_link.font.size = Pt(12)
+            run_link.font.color.rgb = RGBColor(0, 102, 204)  # 綺麗な青
+            run_link.font.underline = True
+            run_link.hyperlink.address = url
+            
+            if after:
+                run_after = p_item.add_run()
+                run_after.text = after
+                run_after.font.size = Pt(12)
+                run_after.font.color.rgb = BLACK
+        else:
+            # マッチしない場合は通常のテキストとして追加
+            run_text = p_item.add_run()
+            run_text.text = item
+            run_text.font.size = Pt(12)
+            run_text.font.color.rgb = BLACK
         
     # 7. ビジュアルマップスライド (OSM地図マージ画像を埋め込み)
     if os.path.exists(map_image_path):
