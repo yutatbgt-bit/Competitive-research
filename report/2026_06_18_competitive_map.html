@@ -191,11 +191,14 @@
       color: #fff;
       transform: scale(1.05);
     }
-    /* 中央スペースのボタン（最下部スクロール時に右下に配置） */
+    /* 中央スペースのボタン（ページの左下最下部に直接配置） */
     #expand-content-btn {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
+      position: relative;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      margin-left: 0;
+      margin-right: auto;
+      display: flex;
     }
     /* MAPスペースのボタン（常に右下に配置） */
     #expand-map-btn {
