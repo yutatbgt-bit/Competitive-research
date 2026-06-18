@@ -446,9 +446,10 @@ def create_presentation(sections, output_path, map_image_path):
             table_shape = slide.shapes.add_table(rows, cols, left, top, width, height)
             table = table_shape.table
             
-            col_widths = [Inches(1.0), Inches(2.2), Inches(1.3), Inches(1.0), Inches(1.5), Inches(4.83)]
+            col_widths = [Inches(1.0), Inches(1.8), Inches(1.0), Inches(1.0), Inches(1.5), Inches(1.0), Inches(4.53)]
             for c_idx, w in enumerate(col_widths):
-                table.columns[c_idx].width = w
+                if c_idx < cols:
+                    table.columns[c_idx].width = w
                 
             for col_idx, header in enumerate(headers):
                 cell = table.cell(0, col_idx)
