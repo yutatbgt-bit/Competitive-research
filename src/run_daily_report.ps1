@@ -54,6 +54,12 @@ if ($updateProcess.ExitCode -ne 0) {
     exit 1
 }
 
+Write-Log "Running auto_lookup_competitors.py..."
+$lookupProcess = Start-Process -FilePath "uv" -ArgumentList "run src/auto_lookup_competitors.py" -WorkingDirectory $workDir -NoNewWindow -PassThru -Wait
+if ($lookupProcess.ExitCode -ne 0) {
+    Write-Log "Warning: auto_lookup_competitors.py failed with exit code $($lookupProcess.ExitCode). Continuing anyway."
+}
+
 Write-Log "Running main.py..."
 
 # 3. レポート作成
@@ -63,7 +69,7 @@ if ($process.ExitCode -eq 0) {
     Write-Log "Report generated successfully. Committing to Git..."
     
     # 以前の特定日付ハードコードのバグを修正し、生成された全ファイルを動的に追加
-    & git add competitive_report.md report/
+    & git add competitive_report.md stores_db.json report/
     & git commit -m "chore: automatic daily report generation"
     
     Write-Log "Git commit completed. Exiting."
