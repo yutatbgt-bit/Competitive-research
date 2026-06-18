@@ -172,9 +172,10 @@
 
     /* 全画面表示用スタイル */
     .expand-btn {
-      position: absolute;
-      top: 15px;
+      position: sticky;
+      bottom: 20px;
       right: 20px;
+      align-self: flex-end;
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(197, 160, 89, 0.4);
       border-radius: 8px;
@@ -188,6 +189,8 @@
       transition: all 0.2s ease;
       z-index: 100;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-top: auto;
+      margin-right: 0;
     }
     .expand-btn:hover {
       background: var(--primary);
@@ -195,9 +198,11 @@
       transform: scale(1.05);
     }
     #expand-map-btn {
-      top: 10px;
-      left: 10px;
-      right: auto;
+      position: absolute;
+      bottom: 25px;
+      right: 10px;
+      top: auto;
+      left: auto;
       z-index: 1000;
     }
     .fullscreen {
@@ -231,7 +236,6 @@
     </div>
 
     <div class="content-panel" style="position: relative;">
-      <button class="expand-btn" id="expand-content-btn" title="全画面表示"><i class="fa-solid fa-expand"></i></button>
       
       <!-- a) 【結論】 -->
       <div class="section-content active" id="tab-summary">
@@ -274,6 +278,7 @@
         <div class="source-grid" id="sources-container"></div>
       </div>
 
+      <button class="expand-btn" id="expand-content-btn" title="全画面表示"><i class="fa-solid fa-expand"></i></button>
     </div>
 
     <!-- 右側マップ -->
