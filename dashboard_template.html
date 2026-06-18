@@ -502,6 +502,7 @@
         let statOpen = 0, statClose = 0, statRest = 0;
         
         REPORT_DATA.details_rows.forEach(r => {
+          if (!r || r[0] === ':---' || r[0].includes('---')) return; // アライメント行をスキップ
           regions.add(r[0]);
           const t = r[3] || '';
           if(t.includes('新規') || t.includes('開店') || t.includes('出店')) statOpen++;
@@ -589,6 +590,7 @@
       tbody.innerHTML = '';
       
       (REPORT_DATA.details_rows || []).forEach(row => {
+        if (!row || row[0] === ':---' || row[0].includes('---')) return; // アライメント行をスキップ
         if(r !== 'all' && row[0] !== r) return;
         if(t === 'open' && !row[3].includes('新規') && !row[3].includes('開店')) return;
         if(t === 'close' && !row[3].includes('閉店')) return;

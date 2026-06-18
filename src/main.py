@@ -35,7 +35,7 @@ def parse_markdown(file_path):
         
         rows = []
         for line in lines:
-            if line.startswith("|") and not re.match(r"^\|[\s:-|]+$", line):
+            if line.startswith("|") and not re.match(r"^\|[\s:| \- ]+$", line):
                 parts = [p.strip() for p in line.split("|")[1:-1]]
                 rows.append(parts)
         if len(rows) > 0:
