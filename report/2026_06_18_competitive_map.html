@@ -170,12 +170,8 @@
     .source-links a { color: var(--text-muted); text-decoration: none; font-size: 12px; display: block; margin-top: 5px; font-weight: 500; }
     .source-links a:hover { color: var(--primary); }
 
-    /* 全画面表示用スタイル */
+    /* 全画面表示用スタイル (ベース) */
     .expand-btn {
-      position: sticky;
-      bottom: 20px;
-      right: 20px;
-      align-self: flex-end;
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(197, 160, 89, 0.4);
       border-radius: 8px;
@@ -189,20 +185,23 @@
       transition: all 0.2s ease;
       z-index: 100;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-top: auto;
-      margin-right: 0;
     }
     .expand-btn:hover {
       background: var(--primary);
       color: #fff;
       transform: scale(1.05);
     }
+    /* 中央スペースのボタン（最下部スクロール時に右下に配置） */
+    #expand-content-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
+    /* MAPスペースのボタン（常に右下に配置） */
     #expand-map-btn {
       position: absolute;
       bottom: 25px;
       right: 10px;
-      top: auto;
-      left: auto;
       z-index: 1000;
     }
     .fullscreen {
