@@ -159,7 +159,15 @@ def filter_stores_for_map(sections, db_data):
         is_mentioned = False
         for name in mentioned_names:
             norm_mentioned = normalize_store_name(name)
-            if norm_db in norm_mentioned or norm_mentioned in norm_db:
+            # 2文字以上の共通部分文字列があるか判定（部分一致の条件を緩和）
+            is_matched = False
+            min_len = 2
+            for i in range(len(norm_db) - min_len + 1):
+                sub = norm_db[i:i+min_len]
+                if sub in norm_mentioned:
+                    is_matched = True
+                    break
+            if is_matched:
                 is_mentioned = True
                 break
                 
