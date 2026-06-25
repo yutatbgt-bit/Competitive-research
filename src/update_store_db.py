@@ -114,7 +114,10 @@ def scrape_ikari_stores():
                 if text.startswith("TEL"):
                     phone = text.replace("TEL", "").replace(":", "").replace("：", "").strip()
                 elif "営業時間" in text:
-                    hours = text.replace("営業時間", "").replace(":", "").replace("：", "").strip()
+                    val = text.replace("営業時間", "").strip()
+                    if val.startswith(":") or val.startswith("："):
+                        val = val[1:].strip()
+                    hours = val
                 elif "駐車場" in text:
                     parking = text.replace("駐車場", "").replace(":", "").replace("：", "").strip()
                     
