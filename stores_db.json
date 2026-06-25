@@ -5,253 +5,299 @@
         34.740587,
         135.311702
       ],
-      "address": "兵庫県芦屋市岩園町1-25",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県芦屋市岩園町1番25号",
+      "hours": "9:30〜21:00",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー芦屋店。公式住所: 兵庫県芦屋市岩園町1-25"
+      "parking": "120台",
+      "features": "いかりスーパー芦屋店。公式住所: 兵庫県芦屋市岩園町1-25",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/ashiya/ashiya.jpg",
+      "phone": "0797-32-7001"
     },
     "岡本店": {
       "coords": [
         34.7251678,
         135.2687448
       ],
-      "address": "兵庫県神戸市東灘区西岡本1-4-3",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県神戸市東灘区西岡本1丁目4番3号",
+      "hours": "1000～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー岡本店。公式住所: 兵庫県神戸市東灘区西岡本1-4-3"
+      "parking": "なし",
+      "features": "いかりスーパー岡本店。公式住所: 兵庫県神戸市東灘区西岡本1-4-3",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_okamoto.jpg",
+      "phone": "078-431-6888"
     },
     "有野店": {
       "coords": [
         34.832616,
         135.228104
       ],
-      "address": "兵庫県神戸市北区有野中町3-12-17",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県神戸市北区有野中町3丁目12番17号",
+      "hours": "1000〜2000",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー有野店。公式住所: 兵庫県神戸市北区有野中町3-12-17"
+      "parking": "なし",
+      "features": "いかりスーパー有野店。公式住所: 兵庫県神戸市北区有野中町3-12-17",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_arino.jpg",
+      "phone": "078-987-3611"
     },
     "六甲店": {
       "coords": [
         34.720621,
         135.233624
       ],
-      "address": "兵庫県神戸市灘区宮山町2-6-15",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県神戸市灘区宮山町2丁目6番15号",
+      "hours": "1000〜2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー六甲店。公式住所: 兵庫県神戸市灘区宮山町2-6-15"
+      "parking": "なし",
+      "features": "いかりスーパー六甲店。公式住所: 兵庫県神戸市灘区宮山町2-6-15",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_rokko.jpg",
+      "phone": "078-821-5650"
     },
     "御影店": {
       "coords": [
         34.717179,
         135.254179
       ],
-      "address": "兵庫県神戸市東灘区御影中町4-3-1",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県神戸市東灘区御影中町4丁目3番1号",
+      "hours": "900〜2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー御影店。公式住所: 兵庫県神戸市東灘区御影中町4-3-1"
+      "parking": "なし",
+      "features": "いかりスーパー御影店。公式住所: 兵庫県神戸市東灘区御影中町4-3-1",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2016/06/store_mikage.jpg",
+      "phone": "078-858-7659"
     },
     "神戸三宮店": {
       "coords": [
-        34.6938,
-        135.1959
+        34.693305,
+        135.196089
       ],
-      "address": "兵庫県神戸市中央区小野柄通7-1-18",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県神戸市中央区小野柄通7丁目1番18号 三宮ビルディング北館地下1階",
+      "hours": "10:00〜21:00",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー神戸三宮店。公式住所: 兵庫県神戸市中央区小野柄通7-1-18"
+      "parking": "なし",
+      "features": "いかりスーパー神戸三宮店。公式住所: 兵庫県神戸市中央区小野柄通7-1-18",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/k_sannomiya/store_k_sannomiya01.jpg",
+      "phone": "078-230-1345"
     },
     "摂津本山駅前店": {
       "coords": [
         34.727013,
         135.2765
       ],
-      "address": "兵庫県神戸市東灘区岡本1-2-18",
-      "hours": "9:30 - 21:00",
+      "address": "神戸市東灘区岡本1丁目2-18 1F",
+      "hours": "1000～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー摂津本山駅前店。公式住所: 兵庫県神戸市東灘区岡本1-2-18"
+      "parking": "なし",
+      "features": "いかりスーパー摂津本山駅前店。公式住所: 兵庫県神戸市東灘区岡本1-2-18",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2021/02/store_settsu_motoyama.jpg",
+      "phone": "078-451-7775"
     },
     "夙川店": {
       "coords": [
         34.74909,
         135.326459
       ],
-      "address": "兵庫県西宮市南越木岩町4-18",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県西宮市南越木岩町4番18号",
+      "hours": "930～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー夙川店。公式住所: 兵庫県西宮市南越木岩町4-18"
+      "parking": "なし",
+      "features": "いかりスーパー夙川店。公式住所: 兵庫県西宮市南越木岩町4-18",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_shukugawa.jpg",
+      "phone": "0798-71-0411"
     },
     "門戸店": {
       "coords": [
         34.756448,
         135.357425
       ],
-      "address": "兵庫県西宮市門戸荘12-14",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県西宮市門戸荘12番14号",
+      "hours": "930～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー門戸店。公式住所: 兵庫県西宮市門戸荘12-14"
+      "parking": "なし",
+      "features": "いかりスーパー門戸店. 公式住所: 兵庫県西宮市門戸荘12-14",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_monto.jpg",
+      "phone": "0798-53-2578"
     },
     "甲子園店": {
       "coords": [
         34.724171,
         135.364035
       ],
-      "address": "兵庫県西宮市甲子園六番町17-10",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県西宮市甲子園六番町17番10号",
+      "hours": "930〜2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー甲子園店。公式住所: 兵庫県西宮市甲子園六番町17-10"
+      "parking": "なし",
+      "features": "いかりスーパー甲子園店。公式住所: 兵庫県西宮市甲子園六番町17-10",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_koshien.jpg",
+      "phone": "0798-46-1111"
     },
     "甲陽園店": {
       "coords": [
         34.761071,
         135.329594
       ],
-      "address": "兵庫県西宮市甲陽園西山町1-66",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県西宮市甲陽園西山町1番66号",
+      "hours": "1000〜2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー甲陽園店。公式住所: 兵庫県西宮市甲陽園西山町1-66"
+      "parking": "なし",
+      "features": "いかりスーパー甲陽園店。公式住所: 兵庫県西宮市甲陽園西山町1-66",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2016/06/store_koyoen.jpg",
+      "phone": "0798-72-3094"
     },
     "宝塚店": {
       "coords": [
         34.803733,
         135.344657
       ],
-      "address": "兵庫県宝塚市南口1-17-18",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県宝塚市南口1丁目17番18号",
+      "hours": "1000〜2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー宝塚店。公式住所: 兵庫県宝塚市南口1-17-18"
+      "parking": "なし",
+      "features": "いかりスーパー宝塚店。公式住所: 兵庫県宝塚市南口1-17-18",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_takarazuka.jpg",
+      "phone": "0797-74-8115"
     },
     "阪急逆瀬川店": {
       "coords": [
         34.797488,
         135.351189
       ],
-      "address": "兵庫県宝塚市逆瀬川1-2-1",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県宝塚市逆瀬川1丁目2番1号",
+      "hours": "1000～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー阪急逆瀬川店。公式住所: 兵庫県宝塚市逆瀬川1-2-1"
+      "parking": "なし",
+      "features": "いかりスーパー阪急逆瀬川店。公式住所: 兵庫県宝塚市逆瀬川1-2-1",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_sakasegawa.jpg",
+      "phone": "0797-76-5671"
     },
     "塚口店": {
       "coords": [
         34.754282,
         135.414315
       ],
-      "address": "兵庫県尼崎市塚口町1-15-8",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県尼崎市塚口町1丁目15番地の8",
+      "hours": "930～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー塚口店。公式住所: 兵庫県尼崎市塚口町1-15-8"
+      "parking": "なし",
+      "features": "いかりスーパー塚口店。公式住所: 兵庫県尼崎市塚口町1-15-8",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_tsukaguchi.jpg",
+      "phone": "06-6421-6074"
     },
     "阪急伊丹店": {
       "coords": [
         34.779838,
         135.413636
       ],
-      "address": "兵庫県伊丹市西台1-1-1",
-      "hours": "9:30 - 21:00",
+      "address": "兵庫県伊丹市西台1丁目1番1号",
+      "hours": "930〜2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー阪急伊丹店。公式住所: 兵庫県伊丹市西台1-1-1"
+      "parking": "なし",
+      "features": "いかりスーパー阪急伊丹店。公式住所: 兵庫県伊丹市西台1-1-1",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_h_itami.jpg",
+      "phone": "072-770-6501"
     },
     "豊中店": {
       "coords": [
         34.786355,
         135.47835
       ],
-      "address": "大阪府豊中市旭丘1-12",
-      "hours": "9:30 - 21:00",
+      "address": "大阪府豊中市旭丘1番12",
+      "hours": "1000〜2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー豊中店。公式住所: 大阪府豊中市旭丘1-12"
+      "parking": "なし",
+      "features": "いかりスーパー豊中店。公式住所: 大阪府豊中市旭丘1-12",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_toyonaka.jpg",
+      "phone": "06-6840-6157"
     },
     "箕面店": {
       "coords": [
         34.832011,
         135.469643
       ],
-      "address": "大阪府箕面市箕面6-5-16",
-      "hours": "9:30 - 21:00",
+      "address": "大阪府箕面市箕面6丁目5番16号",
+      "hours": "",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー箕面店。公式住所: 大阪府箕面市箕面6-5-16"
+      "parking": "35台",
+      "features": "いかりスーパー箕面店。公式住所: 大阪府箕面市箕面6-5-16",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/minoh/MG_7513_360_280.jpg",
+      "phone": "072-724-3190"
     },
     "王子店": {
       "coords": [
         34.802399,
         135.521073
       ],
-      "address": "大阪府吹田市山田西3-57-5",
-      "hours": "9:30 - 21:00",
+      "address": "大阪府吹田市山田西3丁目57-5",
+      "hours": "930～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー王子店。公式住所: 大阪府吹田市山田西3-57-5"
+      "parking": "なし",
+      "features": "いかりスーパー王子店。公式住所: 大阪府吹田市山田西3-57-5",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2019/10/store_oji.jpg",
+      "phone": "06-6876-3004"
     },
     "高槻店": {
       "coords": [
         34.868441,
         135.614144
       ],
-      "address": "大阪府高槻市真上町6-13-11",
-      "hours": "9:30 - 21:00",
+      "address": "大阪府高槻市真上町6丁目13番11号",
+      "hours": "1000～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー高槻店。公式住所: 大阪府高槻市真上町6-13-11"
+      "parking": "なし",
+      "features": "いかりスーパー高槻店。公式住所: 大阪府高槻市真上町6-13-11",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2013/01/store_takatsuki.jpg",
+      "phone": "072-698-0016"
     },
     "JR大阪店": {
       "coords": [
         34.7024,
         135.4959
       ],
-      "address": "大阪府大阪市北区梅田3-1-1",
-      "hours": "9:30 - 21:00",
+      "address": "大阪府大阪市北区梅田3丁目1番1号",
+      "hours": "7:30〜22:30",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパーJR大阪店。公式住所: 大阪府大阪市北区梅田3-1-1"
+      "parking": "なし",
+      "features": "いかりスーパーJR大阪店。公式住所: 大阪府大阪市北区梅田3-1-1",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/jr_osaka/jr_osaka.jpg",
+      "phone": "06-6348-2347"
     },
     "南海なんば店": {
       "coords": [
         34.66387,
         135.500792
       ],
-      "address": "大阪府大阪市中央区難波5-1-60",
-      "hours": "9:30 - 21:00",
+      "address": "大阪府大阪市中央区難波5丁目1番60号",
+      "hours": "1000〜2200",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー南海なんば店。公式住所: 大阪府大阪市中央区難波5-1-60"
+      "parking": "なし",
+      "features": "いかりスーパー南海なんば店. 公式住所: 大阪府大阪市中央区難波5-1-60",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2018/10/nankai_nanba.jpg",
+      "phone": "06-6633-2288"
     },
     "豊中緑丘店": {
       "coords": [
         34.811411,
         135.481529
       ],
-      "address": "大阪府豊中市緑丘4-12-10",
-      "hours": "9:30 - 21:00",
+      "address": "大阪府豊中市緑丘4丁目12番10号",
+      "hours": "930～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパー豊中緑丘店。公式住所: 大阪府豊中市緑丘4-12-10"
+      "parking": "なし",
+      "features": "いかりスーパー豊中緑丘店。公式住所: 大阪府豊中市緑丘4-12-10",
+      "image_url": "http://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/toyonaka_midorigaoka/toyonaka_midorigaoka_store.jpg",
+      "phone": "06-6151-5615"
     },
     "ライクス常盤店": {
       "coords": [
         35.021266,
         135.70196
       ],
-      "address": "京都府京都市右京区太秦京ノ道町10-3",
-      "hours": "9:30 - 21:00",
+      "address": "京都府京都市右京区太秦京ノ道町10番地3",
+      "hours": "1000～2100",
       "area": "N/A",
-      "parking": "N/A",
-      "features": "いかりスーパーライクス常盤店。公式住所: 京都府京都市右京区太秦京ノ道町10-3"
+      "parking": "なし",
+      "features": "いかりスーパーライクス常盤店。公式住所: 京都府京都市右京区太秦京ノ道町10-3",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/uploads/2017/05/store_tokiwa.jpg",
+      "phone": "075-881-7110"
     }
   },
   "competitors": {
