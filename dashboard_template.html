@@ -314,7 +314,7 @@
       pointer-events: auto;
       display: none;
       flex-direction: column;
-      overflow: hidden;
+      overflow-y: auto; /* カード全体をスクロール可能にする */
       opacity: 0;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
@@ -352,8 +352,8 @@
     }
     .card-content {
       padding: 15px;
-      overflow-y: auto;
       flex: 1;
+      /* overflow-y: auto を削除し、親要素のスクロールに委ねる */
     }
     .card-title {
       font-family: var(--font-title);
