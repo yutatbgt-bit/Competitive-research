@@ -297,6 +297,103 @@
       background: none !important;
       border: none !important;
     }
+    
+    /* フローティング情報カードのスタイル */
+    .floating-info-card {
+      position: absolute;
+      top: 50%;
+      width: 360px;
+      max-height: calc(100% - 40px);
+      background: rgba(255, 255, 255, 0.98);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      pointer-events: auto;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .floating-info-card.pos-left {
+      left: 30px;
+      right: auto;
+      transform: translateY(-50%) scale(0.95);
+    }
+    .floating-info-card.pos-left.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+    .floating-info-card.pos-right {
+      right: 30px;
+      left: auto;
+      transform: translateY(-50%) scale(0.95);
+    }
+    .floating-info-card.pos-right.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+    .card-img-container {
+      width: 100%;
+      height: auto;
+      overflow: hidden;
+      background: #f8f9fa;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .card-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .card-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .card-title {
+      font-family: var(--font-title);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 6px;
+    }
+    .card-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-right: 6px;
+    }
+    .card-desc {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(0,0,0,0.1);
+      font-size: 12px;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .card-manager {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0, 70, 40, 0.05);
+      border-left: 3px solid var(--primary);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--text-main);
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -364,6 +461,25 @@
     <div id="map-container" style="flex: 1; height: 100%; position: relative;">
       <div id="map" style="width: 100%; height: 100%;"></div>
       <button class="expand-btn" id="expand-map-btn" title="全画面表示"><i class="fa-solid fa-expand"></i></button>
+      
+      <!-- フローティング情報カード -->
+      <div id="info-card" class="floating-info-card">
+        <div id="card-img-wrapper" class="card-img-container" style="display: none;">
+          <img id="card-img" class="card-img" src="" alt="">
+        </div>
+        <div class="card-content">
+          <div id="card-title" class="card-title"></div>
+          <div class="card-info-list">
+            <div id="card-address-row" style="display: none;"><span class="card-label">住所:</span><span id="card-address"></span></div>
+            <div id="card-phone-row" style="display: none;"><span class="card-label">TEL:</span><span id="card-phone"></span></div>
+            <div id="card-parking-row" style="display: none;"><span class="card-label">駐車場:</span><span id="card-parking"></span></div>
+            <div id="card-hours-row" style="display: none;"><span class="card-label">営業時間:</span><span id="card-hours"></span></div>
+            <div id="card-area-row" style="display: none;"><span class="card-label">売場面積:</span><span id="card-area"></span></div>
+          </div>
+          <div id="card-desc" class="card-desc" style="display: none;"></div>
+          <div id="card-manager" class="card-manager" style="display: none;"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -873,21 +989,32 @@
                 .replace(/'/g, '&#39;');
     }
 
+    // 画像URLのセキュリティ検証 (http/https スキームのみ許可)
+    function safeImageUrl(url) {
+      if (!url) return '';
+      const trimmed = url.trim();
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return escapeHtml(trimmed);
+      }
+      return '';
+    }
+
     const map = L.map('map', { zoomControl: false }).setView([34.764, 135.365], 13);
-    L.control.zoom({ position: 'topright' }).addTo(map);
-    L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-      attribution: '&copy; <a href="https://www.google.com/maps" target="_blank">Google Maps</a>', maxZoom: 20
+    
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    const googleRoads = L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ja&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      attribution: '&copy; Google Maps'
     }).addTo(map);
 
-    // 2点間の距離(km)を計算する関数
     function getDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371.0;
+      const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       return R * c;
     }
@@ -896,6 +1023,12 @@
 
     function initMap() {
       if(!STORES_DATA) return;
+      
+      // 既存マーカーのクリア
+      for (const key in activeMarkers) {
+        map.removeLayer(activeMarkers[key]);
+      }
+      activeMarkers = {};
       
       // 1. 今回のレポートで言及された競合名リストの作成
       const mentionedComps = [];
@@ -928,7 +1061,6 @@
           isMentioned = mentionedComps.some(mName => {
             const normDb = normalizeStoreName(name);
             const normM = normalizeStoreName(mName);
-            // 2文字以上の共通部分文字列があるか判定（部分一致の条件を緩和）
             let isMatched = false;
             const minLen = 2;
             for (let i = 0; i <= normDb.length - minLen; i++) {
@@ -947,35 +1079,21 @@
         }
       }
       
-      // 3. 2km以内のいかり店舗の判定
+      // 3. いかり店舗の抽出
       const plotIkari = {};
       const compKeys = Object.keys(plotCompetitors);
       
-      if (compKeys.length > 0) {
-        for (const [ikariName, ikariInfo] of Object.entries(STORES_DATA.ikari_stores || {})) {
-          let isNearby = false;
-          for (const compName of compKeys) {
-            const compInfo = plotCompetitors[compName];
-            const dist = getDistance(ikariInfo.coords[0], ikariInfo.coords[1], compInfo.coords[0], compInfo.coords[1]);
-            if (dist <= 2.0) {
-              isNearby = true;
-              break;
-            }
-          }
-          if (isNearby) {
-            plotIkari[ikariName] = ikariInfo;
-          }
-        }
-      } else {
-        // 更新情報無し、または対象競合が無い場合は、デフォルトでいかり全店を表示
-        Object.assign(plotIkari, STORES_DATA.ikari_stores || {});
-      }
+      Object.assign(plotIkari, STORES_DATA.ikari_stores || {});
       
       // 4. マップ上にいかり店舗をプロット
       for (const [name, info] of Object.entries(plotIkari)) {
+        if (!info.coords || (info.coords[0] === 0.0 && info.coords[1] === 0.0)) {
+          continue;
+        }
+
         const pinIcon = L.divIcon({
           html: `<svg viewBox="0 0 24 24" width="30" height="30" style="filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3));">
-                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#004628" stroke="#C5A059" stroke-width="1.5"/>
+                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#005bac" stroke="#C5A059" stroke-width="1.5"/>
                  </svg>`,
           className: 'custom-pin-icon',
           iconSize: [30, 30],
@@ -983,33 +1101,38 @@
         });
         const marker = L.marker(info.coords, { icon: pinIcon }).addTo(map);
         
-        // ツールチップに写真と詳細店舗情報を表示
-        const tooltipContent = `
-          <div class="map-tooltip">
-            ${info.image_url ? `<div class="tooltip-img-container"><img src="${escapeHtml(info.image_url)}" class="tooltip-img" alt="${escapeHtml(name)}"></div>` : ''}
-            <div class="tooltip-title">${escapeHtml(name)}</div>
-            <div class="tooltip-info">
-              <div><span class="tooltip-label">住所:</span> ${escapeHtml(info.address || 'N/A')}</div>
-              ${info.phone ? `<div><span class="tooltip-label">電話:</span> ${escapeHtml(info.phone)}</div>` : ''}
-              <div><span class="tooltip-label">営業時間:</span> ${escapeHtml(info.hours || 'N/A')}</div>
-              <div><span class="tooltip-label">駐車場:</span> ${escapeHtml(info.parking || 'N/A')}</div>
-            </div>
-          </div>
-        `;
-        
-        marker.bindTooltip(tooltipContent, { 
-          permanent: false, 
-          direction: 'top',
-          className: 'custom-map-tooltip',
-          opacity: 0.98
+        const validImgUrl = safeImageUrl(info.image_url);
+        const validDetailUrl = safeImageUrl(info.detail_url);
+
+        // プロットクリック時に詳細URLがあれば遷移、なければタブ連携
+        if (validDetailUrl) {
+          marker.on('click', (e) => {
+            if (e.originalEvent) {
+              e.originalEvent.stopPropagation();
+            }
+            window.open(validDetailUrl, '_blank', 'noopener,noreferrer');
+          });
+        } else {
+          marker.on('click', () => selectStoreFromMap(name, 'ikari'));
+        }
+
+        // ホバー時にフローティングカードを表示
+        marker.on('mouseover', (e) => {
+          if (e.originalEvent) {
+            e.originalEvent.stopPropagation();
+          }
+          showInfoCard(name, info, 'ikari');
         });
         
-        marker.on('click', () => selectStoreFromMap(name, 'ikari'));
         activeMarkers['ikari_' + name] = marker;
       }
       
       // 5. マップ上に競合店舗をプロット + 半径2kmサークルを描画
       for (const [name, info] of Object.entries(plotCompetitors)) {
+        if (!info.coords || (info.coords[0] === 0.0 && info.coords[1] === 0.0)) {
+          continue;
+        }
+
         const fillColor = name.includes('ヤマダ') ? '#ff3b30' : '#ff9f0a';
         
         // 半径2km（2000m）の半透明サークルを描画
@@ -1032,11 +1155,6 @@
         });
         const marker = L.marker(info.coords, { icon: pinIcon }).addTo(map);
         
-        // 競合店舗のツールチップ表示
-        const tooltipContent = `
-          <div class="map-tooltip">
-            <div class="tooltip-title competitor-title" style="color: ${fillColor};">${escapeHtml(name.replace('\n', ' '))}</div>
-            <div class="tooltip-info">
               <div><span class="tooltip-label">住所:</span> ${escapeHtml(info.address || 'N/A')}</div>
               <div><span class="tooltip-label">営業時間:</span> ${escapeHtml(info.hours || 'N/A')}</div>
               <div><span class="tooltip-label">駐車場:</span> ${escapeHtml(info.parking || 'N/A')}</div>
@@ -1304,9 +1422,139 @@
       }, 100);
     });
 
+    // フローティングカード表示制御関数
+    function showInfoCard(name, info, type) {
+      const card = document.getElementById('info-card');
+      if (!card) return;
+
+      // プロットの画面上の位置から左右どちらに表示するかを判定
+      let isRightSide = true; 
+      if (info.coords && info.coords.length === 2) {
+        try {
+          const containerPoint = map.latLngToContainerPoint(L.latLng(info.coords[0], info.coords[1]));
+          const mapWidth = map.getSize().x;
+          isRightSide = containerPoint.x >= mapWidth / 2;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      if (isRightSide) {
+        card.classList.remove('pos-right');
+        card.classList.add('pos-left');
+      } else {
+        card.classList.remove('pos-left');
+        card.classList.add('pos-right');
+      }
+
+      const imgWrapper = document.getElementById('card-img-wrapper');
+      const img = document.getElementById('card-img');
+      const title = document.getElementById('card-title');
+      
+      const addressRow = document.getElementById('card-address-row');
+      const address = document.getElementById('card-address');
+      
+      const phoneRow = document.getElementById('card-phone-row');
+      const phone = document.getElementById('card-phone');
+      
+      const parkingRow = document.getElementById('card-parking-row');
+      const parking = document.getElementById('card-parking');
+      
+      const hoursRow = document.getElementById('card-hours-row');
+      const hours = document.getElementById('card-hours');
+
+      const areaRow = document.getElementById('card-area-row');
+      const area = document.getElementById('card-area');
+      
+      const desc = document.getElementById('card-desc');
+      const manager = document.getElementById('card-manager');
+
+      title.textContent = name || '';
+      if (type === 'comp') {
+        title.style.color = name.includes('ヤマダ') ? '#ff3b30' : '#ff9f0a';
+      } else {
+        title.style.color = 'var(--primary)';
+      }
+
+      const validImgUrl = safeImageUrl(info.image_url);
+      if (validImgUrl) {
+        img.src = validImgUrl;
+        img.alt = name || '';
+        imgWrapper.style.display = 'block';
+      } else {
+        imgWrapper.style.display = 'none';
+        img.src = '';
+      }
+
+      if (info.address) {
+        address.textContent = info.address;
+        addressRow.style.display = 'block';
+      } else {
+        addressRow.style.display = 'none';
+      }
+
+      if (info.phone) {
+        phone.textContent = info.phone;
+        phoneRow.style.display = 'block';
+      } else {
+        phoneRow.style.display = 'none';
+      }
+
+      if (info.parking) {
+        parking.textContent = info.parking;
+        parkingRow.style.display = 'block';
+      } else {
+        parkingRow.style.display = 'none';
+      }
+
+      if (info.hours) {
+        hours.textContent = info.hours;
+        hoursRow.style.display = 'block';
+      } else {
+        hoursRow.style.display = 'none';
+      }
+
+      if (info.area) {
+        area.textContent = info.area;
+        areaRow.style.display = 'block';
+      } else {
+        areaRow.style.display = 'none';
+      }
+
+      if (info.features) {
+        desc.textContent = info.features;
+        desc.style.display = 'block';
+      } else {
+        desc.style.display = 'none';
+      }
+
+      if (info.manager) {
+        manager.textContent = `店長からの一言:\n${info.manager}`;
+        manager.style.display = 'block';
+      } else {
+        manager.style.display = 'none';
+      }
+
+      card.classList.add('active');
+    }
+
+    function hideInfoCard() {
+      const card = document.getElementById('info-card');
+      if (card) {
+        card.classList.remove('active');
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       initMap();
       initData();
+
+      // フローティングカード内のスクロールやクリックが背後の地図に伝播するのを防ぐ
+      const card = document.getElementById('info-card');
+      if (card) {
+        L.DomEvent.disableScrollPropagation(card);
+        L.DomEvent.disableClickPropagation(card);
+      }
     });
   </script>
 </body>
