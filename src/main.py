@@ -131,8 +131,11 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 def normalize_store_name(name):
     """
-    店舗名を比較用に正規化する（スーパー特有の名詞や広域の都市名、店表記、括弧を除去）
+    店舗名を比較用に正規化する（スーパー特有の名詞や広域の都市名、店表記、括弧を除去、アルファベット表記揺れの統一）
     """
+    # OASIS表記の統一
+    name = name.replace("OASIS", "オアシス").replace("oasis", "オアシス")
+    
     name = name.split('\n')[0]
     for word in ["スーパー", "ストアー", "ストア", "マーケット", "百貨店", "店", "(仮称)", "（仮称）", "大阪", "兵庫", "京都", "神戸"]:
         name = name.replace(word, "")
@@ -141,9 +144,9 @@ def normalize_store_name(name):
     name = re.sub(r'[\s　]', '', name)
     return name
 
-def filter_stores_for_map(sections, db_data):
+def filter_stores_for_map(sections, db_data, mode="within_2km"):
     """
-    レポートに掲載された競合店と、その半径2km以内のいかりスーパー店舗のみを抽出する
+    レポートに掲載された競合店と、そのいかりスーパー店舗を抽出する（モードにより半径2km制限を適用）
     """
     details_rows = sections.get('details_rows', [])
     mentioned_names = [row[1] for row in details_rows if len(row) > 1]
@@ -154,6 +157,27 @@ def filter_stores_for_map(sections, db_data):
     filtered_competitors = {}
     filtered_ikari = {}
     
+    if mode == "no_limit":
+        # 距離制限なし: レポートに登場した競合店舗すべてと、いかりスーパー全店舗を表示
+        for comp_db_name, comp_coords in competitors_all.items():
+            norm_db = normalize_store_name(comp_db_name)
+            is_mentioned = False
+            for name in mentioned_names:
+                norm_mentioned = normalize_store_name(name)
+                is_matched = False
+                min_len = 2
+                for i in range(len(norm_db) - min_len + 1):
+                    sub = norm_db[i:i+min_len]
+                    if sub in norm_mentioned:
+                        is_matched = True
+                        break
+                if is_matched:
+                    is_mentioned = True
+                    break
+            if is_mentioned:
+                filtered_competitors[comp_db_name] = comp_coords
+        return ikari_all, filtered_competitors
+        
     for comp_db_name, comp_coords in competitors_all.items():
         norm_db = normalize_store_name(comp_db_name)
         is_mentioned = False
@@ -246,19 +270,19 @@ def generate_visual_map(output_path, ikari_stores, competitors):
         font = ImageFont.load_default()
         font_bold = ImageFont.load_default()
         
-    # いかりスーパーを描画 (深緑、ゴールド枠)
+    # いかりスーパーを描画 (ブルー、ゴールド枠)
     for name, (lat, lon) in ikari_stores.items():
         px, py = get_pixel_coords(lat, lon)
         r = 10
         # ゴールド外枠
         draw.ellipse([px-r-2, py-r-2, px+r+2, py+r+2], fill=(212, 175, 55))
-        # 深緑丸
-        draw.ellipse([px-r, py-r, px+r, py+r], fill=(0, 70, 40))
+        # ブルー丸
+        draw.ellipse([px-r, py-r, px+r, py+r], fill=(0, 91, 172))
         # テキストラベル背景
         text_w = draw.textlength(name, font=font_bold)
-        draw.rectangle([px - text_w/2 - 4, py - r - 20, px + text_w/2 + 4, py - r - 3], fill=(255, 255, 255), outline=(0, 70, 40), width=1)
+        draw.rectangle([px - text_w/2 - 4, py - r - 20, px + text_w/2 + 4, py - r - 3], fill=(255, 255, 255), outline=(0, 91, 172), width=1)
         # ラベル描画
-        draw.text((px, py - r - 19), name, fill=(0, 70, 40), font=font_bold, anchor="ma")
+        draw.text((px, py - r - 19), name, fill=(0, 91, 172), font=font_bold, anchor="ma")
 
     # 競合店舗を描画 (赤: ヤマダ、オレンジ: その他)
     for name, (lat, lon) in competitors.items():
@@ -282,8 +306,8 @@ def generate_visual_map(output_path, ikari_stores, competitors):
     # 凡例（Legend）を描画 (左上に枠付きで描画)
     draw.rectangle([10, 10, 260, 100], fill=(255, 255, 255, 230), outline=(150, 150, 150), width=1)
     # いかり
-    draw.ellipse([20-6, 25-6, 20+6, 25+6], fill=(0, 70, 40), outline=(212, 175, 55), width=1)
-    draw.text((35, 18), "いかりスーパー", fill=(0, 70, 40), font=font_bold)
+    draw.ellipse([20-6, 25-6, 20+6, 25+6], fill=(0, 91, 172), outline=(212, 175, 55), width=1)
+    draw.text((35, 18), "いかりスーパー", fill=(0, 91, 172), font=font_bold)
     # ヤマダ
     draw.ellipse([20-6, 50-6, 20+6, 50+6], fill=(255, 0, 0), outline=(0, 0, 0), width=1)
     draw.text((35, 43), "ヤマダストアー (Tier 1)", fill=(0, 0, 0), font=font)
@@ -296,9 +320,9 @@ def generate_visual_map(output_path, ikari_stores, competitors):
     map_img.save(output_path, "PNG")
     print(f"OSMマージ地図画像を生成・保存しました: {output_path}")
 
-def generate_dynamic_web_page(output_path, db_path, md_path, template_path):
+def generate_dynamic_web_page(output_path, db_data, md_path, template_path):
     """
-    stores_db.json と competitive_report_2026_06.md のデータを
+    マージされた店舗データとレポートMarkdownのデータを
     dashboard_template.html 内に埋め込み、統合されたWebダッシュボードを生成する
     """
     import json
@@ -307,17 +331,12 @@ def generate_dynamic_web_page(output_path, db_path, md_path, template_path):
         print(f"Error: Template file {template_path} not found.")
         return
         
-    if not os.path.exists(db_path):
-        print(f"Error: Database file {db_path} not found.")
-        return
-        
     if not os.path.exists(md_path):
         print(f"Error: Markdown file {md_path} not found.")
         return
 
-    # 1. データベースの読み込み
-    with open(db_path, "r", encoding="utf-8") as f:
-        db_content = f.read()
+    # 1. データベースデータのJSON文字列化
+    db_content = json.dumps(db_data, ensure_ascii=False, indent=2)
         
     # 2. レポートMarkdownをパース
     sections = parse_markdown(md_path)
@@ -346,7 +365,7 @@ def create_presentation(sections, output_path, map_image_path):
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
     
-    DARK_GREEN = RGBColor(0, 70, 40)
+    THEME_COLOR = RGBColor(0, 91, 172)
     GOLD = RGBColor(212, 175, 55)
     WHITE = RGBColor(255, 255, 255)
     BLACK = RGBColor(30, 30, 30)
@@ -357,7 +376,7 @@ def create_presentation(sections, output_path, map_image_path):
     slide = prs.slides.add_slide(slide_layout)
     fill = slide.background.fill
     fill.solid()
-    fill.fore_color.rgb = DARK_GREEN
+    fill.fore_color.rgb = THEME_COLOR
     
     txBox = slide.shapes.add_textbox(Inches(1), Inches(2.2), Inches(11.33), Inches(2.5))
     tf = txBox.text_frame
@@ -385,7 +404,7 @@ def create_presentation(sections, output_path, map_image_path):
         p.text = "周辺環境の更新情報について"
         p.font.bold = True
         p.font.size = Pt(28)
-        p.font.color.rgb = DARK_GREEN
+        p.font.color.rgb = THEME_COLOR
         
         content_box = slide.shapes.add_textbox(Inches(0.75), Inches(2.5), Inches(11.83), Inches(3.0))
         tf_content = content_box.text_frame
@@ -408,7 +427,7 @@ def create_presentation(sections, output_path, map_image_path):
     p.text = "a) 【結論】"
     p.font.bold = True
     p.font.size = Pt(28)
-    p.font.color.rgb = DARK_GREEN
+    p.font.color.rgb = THEME_COLOR
     
     content_box = slide.shapes.add_textbox(Inches(0.75), Inches(1.5), Inches(11.83), Inches(5.0))
     tf_content = content_box.text_frame
@@ -441,7 +460,7 @@ def create_presentation(sections, output_path, map_image_path):
             p.text = f"b) 【詳細】 ({slide_idx + 1}ページ目)"
             p.font.bold = True
             p.font.size = Pt(28)
-            p.font.color.rgb = DARK_GREEN
+            p.font.color.rgb = THEME_COLOR
             
             rows = len(slide_rows_data) + 1
             cols = len(headers)
@@ -463,7 +482,7 @@ def create_presentation(sections, output_path, map_image_path):
                 cell = table.cell(0, col_idx)
                 cell.text = header
                 cell.fill.solid()
-                cell.fill.fore_color.rgb = DARK_GREEN
+                cell.fill.fore_color.rgb = THEME_COLOR
                 for paragraph in cell.text_frame.paragraphs:
                     paragraph.font.bold = True
                     paragraph.font.size = Pt(11)
@@ -490,7 +509,7 @@ def create_presentation(sections, output_path, map_image_path):
     p.text = "c) 【地図的分析】"
     p.font.bold = True
     p.font.size = Pt(28)
-    p.font.color.rgb = DARK_GREEN
+    p.font.color.rgb = THEME_COLOR
     
     content_box = slide.shapes.add_textbox(Inches(0.75), Inches(1.4), Inches(11.83), Inches(5.3))
     tf_content = content_box.text_frame
@@ -530,7 +549,7 @@ def create_presentation(sections, output_path, map_image_path):
     p.text = "d) 【影響分析】"
     p.font.bold = True
     p.font.size = Pt(28)
-    p.font.color.rgb = DARK_GREEN
+    p.font.color.rgb = THEME_COLOR
     
     content_box = slide.shapes.add_textbox(Inches(0.75), Inches(1.4), Inches(11.83), Inches(5.3))
     tf_content = content_box.text_frame
@@ -570,7 +589,7 @@ def create_presentation(sections, output_path, map_image_path):
     p.text = "e) 【参照ソース】"
     p.font.bold = True
     p.font.size = Pt(28)
-    p.font.color.rgb = DARK_GREEN
+    p.font.color.rgb = THEME_COLOR
     
     content_box = slide.shapes.add_textbox(Inches(0.75), Inches(1.4), Inches(11.83), Inches(5.3))
     tf_content = content_box.text_frame
@@ -642,7 +661,7 @@ def create_presentation(sections, output_path, map_image_path):
         p.text = "f) 【ビジュアルマップ】"
         p.font.bold = True
         p.font.size = Pt(28)
-        p.font.color.rgb = DARK_GREEN
+        p.font.color.rgb = THEME_COLOR
         
         # 元画像のアスペクト比を維持してスライド中央に配置
         from PIL import Image
@@ -666,16 +685,73 @@ def create_presentation(sections, output_path, map_image_path):
     prs.save(output_path)
     print(f"Presentation saved successfully to: {output_path}")
 
+def parse_ikari_config_md(config_path):
+    if not os.path.exists(config_path):
+        return {}
+        
+    ikari_stores = {}
+    with open(config_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+        
+    table_started = False
+    for line in lines:
+        line = line.strip()
+        if line.startswith("|") and line.endswith("|"):
+            if "店舗名" in line and "住所" in line:
+                table_started = True
+                continue
+            if table_started:
+                # 区切り行をスキップ
+                if re.match(r"^\|[\s:|#-]+\|$", line):
+                    continue
+                
+                cols = [c.strip() for c in line.split("|")][1:-1]
+                if len(cols) >= 9:
+                    name = cols[0]
+                    coords_str = cols[1]
+                    if not name:
+                        continue
+                    
+                    # 座標のパース
+                    coords = None
+                    if coords_str:
+                        try:
+                            lat_lon = [float(x.strip()) for x in coords_str.split(",")]
+                            if len(lat_lon) == 2:
+                                coords = tuple(lat_lon)
+                        except ValueError:
+                            pass
+                            
+                    ikari_stores[name] = {
+                        "coords": coords,
+                        "address": cols[2],
+                        "phone": cols[3],
+                        "parking": cols[4],
+                        "hours": cols[5],
+                        "features": cols[6],
+                        "manager": cols[7] if len(cols) > 7 else "",
+                        "image_url": cols[8] if len(cols) > 8 else "",
+                        "detail_url": cols[9] if len(cols) > 9 else ""
+                    }
+    return ikari_stores
+
 def main():
     import json
+    import argparse
     from datetime import datetime
     
+    parser = argparse.ArgumentParser(description="Generate maps and presentation based on competitive report")
+    parser.add_argument("--mode", choices=["within_2km", "no_limit"], default="within_2km", help="Generation mode")
+    args = parser.parse_args()
+    mode = args.mode
+    
     today_str = datetime.today().strftime("%Y_%m_%d")
-    md_path = "competitive_report.md"
-    pptx_path = f"report/{today_str}_competitive_report.pptx"
-    map_image_path = f"report/{today_str}_competitive_map.png"
-    map_html_path = f"report/{today_str}_competitive_map.html"
+    md_path = "report/competitive_report_within_2km.md" if mode == "within_2km" else "report/competitive_report_no_limit.md"
+    pptx_path = f"report/{today_str}_competitive_report_{mode}.pptx"
+    map_image_path = f"report/{today_str}_competitive_map_{mode}.png"
+    map_html_path = f"report/{today_str}_competitive_map_{mode}.html"
     db_path = "stores_db.json"
+    ikari_config_path = "../ikari_map/config.md"
     
     if not os.path.exists(md_path):
         print(f"Error: {md_path} not found. Cannot convert to PPTX.")
@@ -685,12 +761,66 @@ def main():
         print(f"Error: {db_path} not found. Cannot load store locations.")
         return
 
-    # 位置情報マスタJSONからデータをロード
+    # 1. 基準となる位置情報マスタJSONからデータをロード
     with open(db_path, "r", encoding="utf-8") as f:
         db_data = json.load(f)
 
+    # 2. ikari_map/config.md から最新のいかりスーパー店舗情報を読み込んでマージ
+    config_stores = parse_ikari_config_md(ikari_config_path)
+    if config_stores:
+        print(f"Loaded {len(config_stores)} stores from {ikari_config_path}")
+        
+        # 既存の ikari_stores 辞書をベースに、config.md の情報で更新
+        merged_ikari = {}
+        
+        # 元の stores_db.json にある店舗を config.md で上書きマージ
+        for name, orig_info in db_data.get("ikari_stores", {}).items():
+            if name in config_stores:
+                cfg_info = config_stores[name]
+                # 座標が config.md に定義されている場合はそれを使用し、無ければ元の座標を使う
+                coords = list(cfg_info["coords"]) if cfg_info["coords"] else orig_info.get("coords")
+                merged_ikari[name] = {
+                    "coords": coords,
+                    "address": cfg_info["address"] if cfg_info["address"] else orig_info.get("address"),
+                    "phone": cfg_info["phone"] if cfg_info["phone"] else orig_info.get("phone"),
+                    "parking": cfg_info["parking"] if cfg_info["parking"] else orig_info.get("parking"),
+                    "hours": cfg_info["hours"] if cfg_info["hours"] else orig_info.get("hours"),
+                    "features": cfg_info["features"] if cfg_info["features"] else orig_info.get("features"),
+                    "manager": cfg_info.get("manager") if cfg_info.get("manager") else orig_info.get("manager", ""),
+                    "image_url": cfg_info["image_url"] if cfg_info["image_url"] else orig_info.get("image_url"),
+                    "detail_url": cfg_info.get("detail_url") if cfg_info.get("detail_url") else orig_info.get("detail_url", ""),
+                    "area": orig_info.get("area", "N/A")
+                }
+            else:
+                # config.md に記載がない店舗はそのまま残す
+                merged_ikari[name] = orig_info
+                
+        # config.md にのみ存在する新規店舗があれば追加
+        for name, cfg_info in config_stores.items():
+            if name not in merged_ikari:
+                # 座標がある場合のみ追加
+                if cfg_info["coords"]:
+                    merged_ikari[name] = {
+                        "coords": list(cfg_info["coords"]),
+                        "address": cfg_info["address"],
+                        "phone": cfg_info["phone"],
+                        "parking": cfg_info["parking"],
+                        "hours": cfg_info["hours"],
+                        "features": cfg_info["features"],
+                        "manager": cfg_info.get("manager", ""),
+                        "image_url": cfg_info["image_url"],
+                        "detail_url": cfg_info.get("detail_url", ""),
+                        "area": "N/A"
+                    }
+                    
+        db_data["ikari_stores"] = merged_ikari
+
     # リスト形式の座標をタプルに変換してマッピングに適用
-    ikari_stores = {name: tuple(info["coords"]) for name, info in db_data.get("ikari_stores", {}).items()}
+    ikari_stores = {}
+    for name, info in db_data.get("ikari_stores", {}).items():
+        if info.get("coords"):
+            ikari_stores[name] = tuple(info["coords"])
+            
     competitors = {name: tuple(info["coords"]) for name, info in db_data.get("competitors", {}).items()}
     
     # 0. Markdown解析
@@ -699,11 +829,11 @@ def main():
     # 1. OpenStreetMapマージによる高精度な背景地図画像の自動生成
     # (更新情報がある場合のみ、スライド用のビジュアルマップ画像を生成)
     if not sections.get('no_update'):
-        filtered_ikari, filtered_comp = filter_stores_for_map(sections, db_data)
+        filtered_ikari, filtered_comp = filter_stores_for_map(sections, db_data, mode=mode)
         generate_visual_map(map_image_path, filtered_ikari, filtered_comp)
     
     # 2. レポート統合型HTMLダッシュボードの自動生成
-    generate_dynamic_web_page(map_html_path, db_path, md_path, "dashboard_template.html")
+    generate_dynamic_web_page(map_html_path, db_data, md_path, "dashboard_template.html")
     
     # 3. PowerPoint生成（地図画像をスライドに挿入）
     os.makedirs(os.path.dirname(pptx_path), exist_ok=True)
