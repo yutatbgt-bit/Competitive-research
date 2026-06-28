@@ -302,10 +302,8 @@
     .floating-info-card {
       position: absolute;
       top: 50%;
-      width: 33%;
-      min-width: 160px;
-      max-width: 240px;
-      max-height: 300px; /* 元の縦横比を維持するため、高さを最大300pxに制限 */
+      width: 360px;
+      max-height: calc(100% - 40px);
       background: rgba(255, 255, 255, 0.98);
       border: 2px solid var(--accent);
       border-radius: 16px;
@@ -314,29 +312,31 @@
       pointer-events: auto;
       display: none;
       flex-direction: column;
-      overflow: hidden; /* カード全体はスクロールさせず、画像を固定する */
+      overflow: hidden;
       opacity: 0;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
     .floating-info-card.pos-left {
       left: 15px;
       right: auto;
-      transform: translateY(-50%) scale(0.95);
+      transform: translateY(-50%) scale(0.31);
+      transform-origin: left center; /* 左端を基準に等倍縮小 */
     }
     .floating-info-card.pos-left.active {
       display: flex;
       opacity: 1;
-      transform: translateY(-50%) scale(1);
+      transform: translateY(-50%) scale(0.33);
     }
     .floating-info-card.pos-right {
       right: 15px;
       left: auto;
-      transform: translateY(-50%) scale(0.95);
+      transform: translateY(-50%) scale(0.31);
+      transform-origin: right center; /* 右端を基準に等倍縮小 */
     }
     .floating-info-card.pos-right.active {
       display: flex;
       opacity: 1;
-      transform: translateY(-50%) scale(1);
+      transform: translateY(-50%) scale(0.33);
     }
     .card-img-container {
       width: 100%;
@@ -351,27 +351,27 @@
       display: block;
     }
     .card-content {
-      padding: 15px;
+      padding: 20px;
       flex: 1;
-      min-height: 0; /* フレックスコンテナ内で子要素が縮むようにする */
-      overflow-y: auto; /* テキスト領域のみ上下スクロールを有効にする */
+      min-height: 0;
+      overflow-y: auto;
     }
     .card-title {
       font-family: var(--font-title);
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 700;
       color: var(--primary);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       border-bottom: 2px solid var(--accent);
-      padding-bottom: 4px;
+      padding-bottom: 6px;
     }
     .card-info-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 12px;
+      gap: 8px;
+      font-size: 13px;
       line-height: 1.5;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     .card-label {
       font-weight: 700;
@@ -379,21 +379,21 @@
       margin-right: 6px;
     }
     .card-desc {
-      margin-top: 8px;
-      padding-top: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
       border-top: 1px dashed rgba(0,0,0,0.1);
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-main);
       line-height: 1.6;
       white-space: pre-wrap;
     }
     .card-manager {
-      margin-top: 8px;
-      padding: 8px;
+      margin-top: 10px;
+      padding: 10px;
       background: rgba(0, 70, 40, 0.05);
       border-left: 3px solid var(--primary);
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-main);
       white-space: pre-wrap;
     }
