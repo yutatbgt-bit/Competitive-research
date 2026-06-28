@@ -664,19 +664,12 @@
         });
         const marker = L.marker(info.coords, { icon: pinIcon }).addTo(map);
         
-              <div><span class="tooltip-label">住所:</span> ${escapeHtml(info.address || 'N/A')}</div>
-              <div><span class="tooltip-label">営業時間:</span> ${escapeHtml(info.hours || 'N/A')}</div>
-              <div><span class="tooltip-label">駐車場:</span> ${escapeHtml(info.parking || 'N/A')}</div>
-              ${info.features ? `<div class="tooltip-desc">${escapeHtml(info.features)}</div>` : ''}
-            </div>
-          </div>
-        `;
-        
-        marker.bindTooltip(tooltipContent, { 
-          permanent: false, 
-          direction: 'top',
-          className: 'custom-map-tooltip',
-          opacity: 0.98
+        // ホバー時にフローティングカードを表示
+        marker.on('mouseover', (e) => {
+          if (e.originalEvent) {
+            e.originalEvent.stopPropagation();
+          }
+          showInfoCard(name, info, 'comp');
         });
         
         marker.on('click', () => selectStoreFromMap(name, 'comp'));
@@ -691,6 +684,11 @@
         const bounds = L.latLngBounds(allCoords);
         map.fitBounds(bounds, { padding: [50, 50] });
       }
+
+      // 地図の何もない場所をクリックした時にカードを非表示にする
+      map.on('click', () => {
+        hideInfoCard();
+      });
     }
 
     function selectStoreFromMap(name, type) {
