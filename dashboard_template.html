@@ -302,9 +302,9 @@
     .floating-info-card {
       position: absolute;
       top: 50%;
-      width: 30%;
-      min-width: 220px;
-      max-width: 360px;
+      width: 33%;
+      min-width: 160px;
+      max-width: 240px;
       max-height: calc(100% - 40px);
       background: rgba(255, 255, 255, 0.98);
       border: 2px solid var(--accent);
@@ -314,7 +314,7 @@
       pointer-events: auto;
       display: none;
       flex-direction: column;
-      overflow-y: auto; /* カード全体をスクロール可能にする */
+      overflow: hidden; /* カード全体はスクロールさせず、画像を固定する */
       opacity: 0;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
@@ -353,7 +353,8 @@
     .card-content {
       padding: 15px;
       flex: 1;
-      /* overflow-y: auto を削除し、親要素のスクロールに委ねる */
+      min-height: 0; /* フレックスコンテナ内で子要素が縮むようにする */
+      overflow-y: auto; /* テキスト領域のみ上下スクロールを有効にする */
     }
     .card-title {
       font-family: var(--font-title);
