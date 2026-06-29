@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://*.openstreetmap.org https://mt1.google.com https://unpkg.com https://www.ikarisuper.com; connect-src 'self';">
+  <title>いかりスーパー周辺 競合環境ダッシュボード</title>
+  <!-- Google Fonts: Outfit, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <style>
+    :root {
+      --primary: #004628;      /* いかりスーパーの深緑 */
+      --primary-light: #006b3e;
+      --accent: #C5A059;       /* 落ち着いたブラスゴールド */
+      --accent-hover: #b08d4b;
+      --bg-base: #f4f5f6;      /* モダンでシックな極淡クールグレー */
+      --bg-card: rgba(255, 255, 255, 0.85); /* ホワイトグラスモーフィズム */
+      --text-main: #2c3e35;    /* 濃いスレートグレー */
+      --text-muted: #6b7a72;
+      --border-color: rgba(197, 160, 89, 0.3);
+      --font-title: 'Outfit', 'Inter', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --danger: #ff453a;
+      --warning: #ff9f0a;
+      --success: #30d158;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent);
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-logo { display: flex; align-items: center; gap: 15px; }
+    .header-logo i { color: var(--primary); font-size: 26px; animation: pulse 2s infinite ease-in-out; }
+    @keyframes pulse { 0% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.9; } }
+    
+    .header-logo h1 {
+      font-family: var(--font-title); font-size: 22px; font-weight: 700; letter-spacing: 1.5px;
+      color: var(--primary);
+    }
+    
+    .header-meta { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+    .app-container {
+      flex: 1; display: flex; position: relative; overflow: hidden;
+    }
+
+    .nav-panel {
+      width: 205px;
+      background: rgba(250, 250, 251, 0.65);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(0,0,0,0.05);
+      display: flex; flex-direction: column; padding: 25px 10px; gap: 10px; z-index: 15;
+    }
+
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px; padding: 12px 12px; border-radius: 12px;
+      color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-btn:hover { background: rgba(0, 70, 40, 0.05); color: var(--primary); }
+    .nav-btn.active { background: rgba(0, 70, 40, 0.08); border-color: var(--border-color); color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+    .nav-btn i { font-size: 16px; width: 20px; text-align: center; }
+
+    .content-panel {
+      flex: 1; height: 100%; overflow-y: auto; padding: 20px 30px; display: flex; flex-direction: column; gap: 20px;
+      background: transparent; z-index: 10; border-right: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    #map { flex: 1; height: 100%; z-index: 1; }
+
+    .section-content { display: none; animation: slideUp 0.4s ease forwards; }
+    .section-content.active { display: flex; flex-direction: column; gap: 20px; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-title {
+      font-family: var(--font-title); font-size: 22px; font-weight: 700; color: var(--primary);
+      display: flex; align-items: center; gap: 12px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 5px;
+    }
+    .section-title i { color: var(--accent); }
+
+    .summary-card {
+      background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 20px;
+      line-height: 1.7; font-size: 14px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04); backdrop-filter: blur(10px);
+    }
+
+    .summary-stats { display: flex; gap: 15px; margin-top: 10px; }
+    .stat-box {
+      flex: 1; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.06); border-radius: 12px;
+      padding: 15px; text-align: center; cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .stat-box:hover { border-color: var(--accent); background: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+    .stat-num { font-size: 26px; font-weight: 700; font-family: var(--font-title); color: #e88d43; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+
+    .table-controls { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .search-box { flex: 1; position: relative; }
+    .search-box input {
+      width: 100%; background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
+      padding: 10px 15px 10px 40px; color: var(--text-main); font-size: 13px; transition: all 0.3s; backdrop-filter: blur(8px);
+    }
+    .search-box input:focus { border-color: var(--accent); outline: none; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+    .search-box i { position: absolute; left: 15px; top: 12px; color: var(--text-muted); }
+    
+    .select-filter {
+      background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
+      padding: 8px 12px; color: var(--text-main); font-size: 13px; outline: none; cursor: pointer; backdrop-filter: blur(8px);
+    }
+    .select-filter option { background: #fff; }
+
+    .table-container {
+      background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
+      overflow-x: auto; box-shadow: 0 4px 20px 0 rgba(0,0,0,0.03); backdrop-filter: blur(12px);
+    }
+    table { width: 100%; min-width: 900px; border-collapse: collapse; text-align: left; font-size: 13px; line-height: 1.5; }
+    th { background: rgba(0,0,0,0.02); color: var(--primary); font-weight: 700; padding: 12px 15px; border-bottom: 1px solid rgba(0,0,0,0.08); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    td { padding: 12px 15px; border-bottom: 1px solid rgba(0,0,0,0.04); background: rgba(255,255,255,0.4); vertical-align: middle; }
+    td:nth-child(-n+6) { white-space: nowrap; }
+    td:nth-child(7) { min-width: 350px; word-break: break-all; }
+    
+    .badge-op { background: rgba(48, 209, 88, 0.15); color: var(--success); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid rgba(48, 209, 88, 0.3); }
+    .badge-cl { background: rgba(255, 69, 58, 0.15); color: var(--danger); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid rgba(255, 69, 58, 0.3); }
+    .badge-rw { background: rgba(255, 159, 10, 0.15); color: var(--warning); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid rgba(255, 159, 10, 0.3); }
+
+    .influence-list { display: flex; flex-direction: column; gap: 15px; }
+    .influence-card {
+      background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 16px; padding: 20px;
+      cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    }
+    .influence-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(197, 160, 89, 0.15); }
+    .influence-card.selected { border-color: var(--accent); background: rgba(0, 70, 40, 0.05); box-shadow: 0 8px 30px rgba(0, 70, 40, 0.1); }
+    .card-header { display: flex; justify-content: space-between; font-weight: 700; color: var(--primary); font-size: 16px; }
+    .card-body { color: var(--text-main); line-height: 1.6; font-size: 14px; }
+
+    .source-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+    .source-card { background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 16px; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+    .source-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(197, 160, 89, 0.1); }
+    .source-num { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; }
+    .source-title { font-size: 14px; font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+    .source-links a { color: var(--text-muted); text-decoration: none; font-size: 12px; display: block; margin-top: 5px; font-weight: 500; }
+    .source-links a:hover { color: var(--primary); }
+
+    /* 全画面表示用スタイル (ベース) */
+    .expand-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(197, 160, 89, 0.4);
+      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--primary);
+      transition: all 0.2s ease;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .expand-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: scale(1.05);
+    }
+    /* 中央スペースのボタン（ページの右下最下部に直接配置） */
+    #expand-content-btn {
+      position: relative;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      margin-left: auto;
+      margin-right: 0;
+      display: flex;
+    }
+    /* MAPスペースのボタン（常に右下に配置） */
+    #expand-map-btn {
+      position: absolute;
+      bottom: 25px;
+      right: 10px;
+      z-index: 1000;
+    }
+    .fullscreen {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      z-index: 9999 !important;
+      background: var(--bg-base) !important;
+      padding: 30px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* マップのカスタムツールチップスタイル */
+    .custom-map-tooltip {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border: 1px solid var(--accent) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+      padding: 0 !important;
+      overflow: hidden;
+      font-family: var(--font-body) !important;
+      color: var(--text-main) !important;
+      white-space: normal !important;
+      word-wrap: break-word !important;
+    }
+    
+    .map-tooltip {
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .tooltip-img-container {
+      width: 100%;
+      height: 140px;
+      overflow: hidden;
+      background: #eee;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .tooltip-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .tooltip-title {
+      font-family: var(--font-title);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      padding: 12px 15px 6px 15px;
+    }
+    
+    .competitor-title {
+      font-size: 14px;
+    }
+    
+    .tooltip-info {
+      padding: 0 15px 12px 15px;
+      font-size: 11px;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .tooltip-label {
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+    
+    .tooltip-desc {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(0,0,0,0.1);
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    body.dark-theme #map svg.leaflet-zoom-pane,
+    body.dark-theme #map .leaflet-marker-pane {
+      filter: invert(1.11) hue-rotate(180deg);
+    }
+    .custom-pin-icon {
+      background: none !important;
+      border: none !important;
+    }
+    
+    /* フローティング情報カードのスタイル */
+    .floating-info-card {
+      position: absolute;
+      top: 50%;
+      width: 360px;
+      max-height: calc(100% - 40px);
+      background: rgba(255, 255, 255, 0.98);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      pointer-events: auto;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .floating-info-card.pos-left {
+      left: 15px;
+      right: auto;
+      transform: translateY(-50%) scale(0.48);
+      transform-origin: left center; /* 左端を基準に等倍縮小(等倍の50%) */
+    }
+    .floating-info-card.pos-left.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(-50%) scale(0.50);
+    }
+    .floating-info-card.pos-right {
+      right: 15px;
+      left: auto;
+      transform: translateY(-50%) scale(0.48);
+      transform-origin: right center; /* 右端を基準に等倍縮小(等倍の50%) */
+    }
+    .floating-info-card.pos-right.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(-50%) scale(0.50);
+    }
+    .card-img-container {
+      width: 100%;
+      height: auto;
+      overflow: hidden;
+      background: #f8f9fa;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .card-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .card-content {
+      padding: 20px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .card-title {
+      font-family: var(--font-title);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 6px;
+    }
+    .card-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-right: 6px;
+    }
+    .card-desc {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(0,0,0,0.1);
+      font-size: 12px;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .card-manager {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0, 70, 40, 0.05);
+      border-left: 3px solid var(--primary);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--text-main);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-logo"><i class="fa-solid fa-compass"></i><h1>ikari Competitive Dashboard</h1></div>
+    <div class="header-meta"><i class="fa-solid fa-calendar-days"></i> 2026年6月度版 競合環境調査レポート</div>
+  </header>
+
+  <div class="app-container">
+    <div class="nav-panel">
+      <div class="nav-btn active" data-tab="tab-summary"><i class="fa-solid fa-gauge"></i> 総合サマリー</div>
+      <div class="nav-btn" data-tab="tab-details"><i class="fa-solid fa-list-ul"></i> 競合動向テーブル</div>
+      <div class="nav-btn" data-tab="tab-influence"><i class="fa-solid fa-triangle-exclamation"></i> 店舗別影響分析</div>
+      <div class="nav-btn" data-tab="tab-sources"><i class="fa-solid fa-link"></i> 参照ソース</div>
+    </div>
+
+    <div class="content-panel" style="position: relative;">
+      
+      <!-- a) 【結論】 -->
+      <div class="section-content active" id="tab-summary">
+        <div class="section-title"><i class="fa-solid fa-gauge"></i> 総合サマリー（結論）</div>
+        <div class="summary-card" id="conclusion-text"></div>
+        <div class="summary-stats">
+          <div class="stat-box" data-type="open"><div class="stat-num" id="stat-open">0</div><div class="stat-label">新規開店・改装</div></div>
+          <div class="stat-box" data-type="close"><div class="stat-num" id="stat-close">0</div><div class="stat-label">閉店・業態転換</div></div>
+          <div class="stat-box" data-type="rest"><div class="stat-num" id="stat-rest">0</div><div class="stat-label">休業・その他</div></div>
+        </div>
+      </div>
+
+      <!-- b) 【詳細】 -->
+      <div class="section-content" id="tab-details">
+        <div class="section-title"><i class="fa-solid fa-list-ul"></i> 競合動向詳細テーブル</div>
+        <div class="table-controls">
+          <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="table-search" placeholder="検索..."></div>
+          <select class="select-filter" id="filter-region"><option value="all">すべての地域</option></select>
+          <select class="select-filter" id="filter-type">
+            <option value="all">すべての内容</option><option value="open">新規開店・改装予定</option><option value="close">閉店・業態転換予定</option><option value="rest">臨時休業・その他</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table id="details-table">
+            <thead><tr id="table-headers-tr"></tr></thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- d) 【影響分析】 -->
+      <div class="section-content" id="tab-influence">
+        <div class="section-title"><i class="fa-solid fa-triangle-exclamation"></i> いかり店舗別影響分析</div>
+        <div class="influence-list" id="influence-cards-container"></div>
+      </div>
+
+      <!-- e) 【参照ソース】 -->
+      <div class="section-content" id="tab-sources">
+        <div class="section-title"><i class="fa-solid fa-link"></i> 参照ソース</div>
+        <div class="source-grid" id="sources-container"></div>
+      </div>
+
+      <button class="expand-btn" id="expand-content-btn" title="全画面表示"><i class="fa-solid fa-expand"></i></button>
+    </div>
+
+    <!-- 右側マップ -->
+    <div id="map-container" style="flex: 1; height: 100%; position: relative;">
+      <div id="map" style="width: 100%; height: 100%;"></div>
+      <button class="expand-btn" id="expand-map-btn" title="全画面表示"><i class="fa-solid fa-expand"></i></button>
+      
+      <!-- フローティング情報カード -->
+      <div id="info-card" class="floating-info-card">
+        <div id="card-img-wrapper" class="card-img-container" style="display: none;">
+          <img id="card-img" class="card-img" src="" alt="">
+        </div>
+        <div class="card-content">
+          <div id="card-title" class="card-title"></div>
+          <div class="card-info-list">
+            <div id="card-address-row" style="display: none;"><span class="card-label">住所:</span><span id="card-address"></span></div>
+            <div id="card-phone-row" style="display: none;"><span class="card-label">TEL:</span><span id="card-phone"></span></div>
+            <div id="card-parking-row" style="display: none;"><span class="card-label">駐車場:</span><span id="card-parking"></span></div>
+            <div id="card-hours-row" style="display: none;"><span class="card-label">営業時間:</span><span id="card-hours"></span></div>
+            <div id="card-area-row" style="display: none;"><span class="card-label">売場面積:</span><span id="card-area"></span></div>
+          </div>
+          <div id="card-desc" class="card-desc" style="display: none;"></div>
+          <div id="card-manager" class="card-manager" style="display: none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const REPORT_DATA = {"no_update": true};
+    const STORES_DATA = {
+  "ikari_stores": {
+    "芦屋店": {
+      "coords": [
+        34.740587,
+        135.311702
+      ],
+      "address": "芦屋市岩園町1番25号",
+      "phone": "0797-32-7001",
+      "parking": "90台",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー芦屋店。公式住所: 兵庫県芦屋市岩園町1-25",
+      "manager": "いかり芦屋店店長 梅﨑　久哉 : 芦屋のお客様にご満足いただける品揃えとサービスを目指して参ります。お気付きの点がございましたらお気軽にお声をお掛けくださいませ。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/ashiya/ashiya.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/ashiya/",
+      "area": "N/A"
+    },
+    "岡本店": {
+      "coords": [
+        34.7251678,
+        135.2687448
+      ],
+      "address": "神戸市東灘区西岡本1丁目4番3号",
+      "phone": "078-431-6888",
+      "parking": "36台",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー岡本店。公式住所: 兵庫県神戸市東灘区西岡本1-4-3",
+      "manager": "いかり岡本店店長井尻　哲矢 : 品質、品揃え共にこれまでよりも更にご来店いただくお客様にご満足いただけるようになりました。新しくなったいかり岡本店へ是非足をお運びくださいませ。 お気づきの点等ございましたらお気軽にお声をおかけくださいませ。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/okamoto/okamoto_1.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/okamoto/",
+      "area": "N/A"
+    },
+    "有野店": {
+      "coords": [
+        34.832616,
+        135.228104
+      ],
+      "address": "神戸市北区有野中町3丁目12番17号",
+      "phone": "078-987-3611",
+      "parking": "66台",
+      "hours": "10:00〜20:00",
+      "features": "いかりスーパー有野店。公式住所: 兵庫県神戸市北区有野中町3-12-17",
+      "manager": "いかり有野店店長谷本　雅章 : こちらは北区はもとより三田などの遠くからお車でお越しいただくお客様が多いので、できるだけ当店で目的の品を揃えていただけるように商品の品揃えと品切れの無い店になるよう努力しています。お気づきの点がございましたら何なりとお申し付けください。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/arino/arino_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/arino/",
+      "area": "N/A"
+    },
+    "六甲店": {
+      "coords": [
+        34.720621,
+        135.233624
+      ],
+      "address": "神戸市灘区宮山町2丁目6番15号",
+      "phone": "078-821-5650",
+      "parking": "8台",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー六甲店。公式住所: 兵庫県神戸市灘区宮山町2-6-15",
+      "manager": "いかり六甲店店長川畑　基 : お客様の喜びは私たちの喜びでもあります。 全てのお客様に喜んで頂けますよう、新鮮な食材とスタッフの笑顔をご用意させて頂き、お待ち致しております。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/rokko/rokko_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/rokko/",
+      "area": "N/A"
+    },
+    "御影店": {
+      "coords": [
+        34.717179,
+        135.254179
+      ],
+      "address": "神戸市東灘区御影中町4丁目3番1号",
+      "phone": "078-858-7659",
+      "parking": "14台",
+      "hours": "9:00〜21:00",
+      "features": "いかりスーパー御影店. 公式住所: 兵庫県神戸市東灘区御影中町4-3-1",
+      "manager": "いかり御影店店長踏分　英一郎 : できたてのデリカコーナー、入口付近にはお花のコーナーもご用意してナチュラルな装いいっぱいでお出迎えさせていただきます。 店内には喫茶コーナーもご用意いたしております。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/mikage/store_mikage01.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/mikage/",
+      "area": "N/A"
+    },
+    "神戸三宮店": {
+      "coords": [
+        34.693305,
+        135.196089
+      ],
+      "address": "神戸市中央区小野柄通7丁目1番18号 三宮ビルディング北館地下1階",
+      "phone": "078-230-1345",
+      "parking": "なし",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー神戸三宮店。公式住所: 兵庫県神戸市中央区小野柄通7-1-18",
+      "manager": "いかり神戸三宮店店長田村　尋孝 : 旧「いかり阪急三宮店」の閉店から約半年、再び神戸三宮の地で「いかり神戸三宮店」をオープンすることができました。神戸はいかりのルーツでもある洋菓子専門店の発祥の地。その地でさらに進化した新しいお店づくりに挑戦し、神戸の皆様のお役に立てるようスタッフ一同頑張って参ります。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/k_sannomiya/store_k_sannomiya01.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/k_sannomiya/",
+      "area": "N/A"
+    },
+    "摂津本山駅前店": {
+      "coords": [
+        34.727013,
+        135.2765
+      ],
+      "address": "神戸市東灘区岡本1丁目2-18  1F",
+      "phone": "078-451-7775",
+      "parking": "なし",
+      "hours": "10:00～21:00",
+      "features": "いかりスーパー摂津本山駅前店。公式住所: 兵庫県神戸市東灘区岡本1-2-18",
+      "manager": "いかり摂津本山駅前店店長山下　幸宏 : 駅前のお店で便利にご利用いただけると嬉しいです。おかげさまでいかりシップ会員様も多くご入会いただいています。 安心、安全な商品のご提供ができるよう努力して参りますので今後ともご愛顧いただきますようよろしくお願い致します。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/settsu_motoyama/r1_c1.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/settsu_motoyama/",
+      "area": "N/A"
+    },
+    "夙川店": {
+      "coords": [
+        34.74909,
+        135.326459
+      ],
+      "address": "西宮市南越木岩町4番18号",
+      "phone": "0798-71-0411",
+      "parking": "57台（ラ・グルメゾンと共有）",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー夙川店。公式住所: 兵庫県西宮市南越木岩町4-18",
+      "manager": "いかり夙川店店長辻本　武男 : お客様に喜んでいただけるお店作り、満足して頂けるお店作りを行ってまいります。 品質・鮮度には細心の注意を払い、心からの接客サービスを常に心がけております。 お気づきの点等ございましたらお気軽にお声をおかけ下さいませ。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/shukugawa/shukugawa_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/shukugawa/",
+      "area": "N/A"
+    },
+    "門戸店": {
+      "coords": [
+        34.756448,
+        135.357425
+      ],
+      "address": "西宮市門戸荘12番14号",
+      "phone": "0798-53-2578",
+      "parking": "44台",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー門戸店. 公式住所: 兵庫県西宮市門戸荘12-14",
+      "manager": "いかり門戸店店長今井 清一 : 阪急今津線の線路沿いに見える門戸店は地下に店舗、地上、屋上に駐車場があります。 地下にある狭さを感じないように広い吹き抜けとゆったりお買い物をお楽しみいただける通路を確保しています。 また店内には職人が握る寿司をその場でお召し上がりいただける寿司処　濱寿司や喫茶スペースオンディーヌをご用意。店内でゆっくりとお買い物をお楽しみいただいたあともゆっくりとお過ごしいただけるスペースをご用意しています。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/mondo/mondo_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/mondo/",
+      "area": "N/A"
+    },
+    "甲子園店": {
+      "coords": [
+        34.724171,
+        135.364035
+      ],
+      "address": "西宮市甲子園六番町17番10号",
+      "phone": "0798-46-1111",
+      "parking": "24台",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー甲子園店。公式住所: 兵庫県西宮市甲子園六番町17-10",
+      "manager": "いかり甲子園店店長三輪　太一 : 明るい店内と新しくなった設備、お買いまわりいただきやすい商品レイアウトで、もっと楽しく、もっと美味しくなったいかり甲子園店へぜひお越しいただきますようご案内申し上げます。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/koshien/koshien_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/koshien/",
+      "area": "N/A"
+    },
+    "甲陽園店": {
+      "coords": [
+        34.761071,
+        135.329594
+      ],
+      "address": "西宮市甲陽園西山町1番66号",
+      "phone": "0798-72-3094",
+      "parking": "提携駐車場あり",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー甲陽園店。公式住所: 兵庫県西宮市甲陽園西山町1-66",
+      "manager": "いかり甲陽園店店長青木　宏徳 : 地域のお客様にとって便利な売場づくりを行い、より一層ご満足いただけるような店づくりとサービスに努めて参りますので末永くご愛顧いただきますようお願いいたします。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/koyoen/store_koyoen01.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/koyoen/",
+      "area": "N/A"
+    },
+    "宝塚店": {
+      "coords": [
+        34.803733,
+        135.344657
+      ],
+      "address": "宝塚市南口1丁目17番18号",
+      "phone": "0797-74-8115",
+      "parking": "23台",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー宝塚店。公式住所: 兵庫県宝塚市南口1-17-18",
+      "manager": "いかり宝塚店店長伊藤　真孝 : いつもご愛顧誠にありがとうございます。 宝塚店はより広くお買い物をお楽しみいただきやすい店内とより充実した品揃えでお客様のお越しをお待ちしております。 毎日のお客様の食生活のお役に立てますよう、従業員一同努力してまいりますので、今後ともご愛顧賜りますようお願い申しあげます。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/takarazuka/takarazuka_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/takarazuka/",
+      "area": "N/A"
+    },
+    "阪急逆瀬川店": {
+      "coords": [
+        34.797488,
+        135.351189
+      ],
+      "address": "宝塚市逆瀬川1丁目2番1号",
+      "phone": "0797-76-5671",
+      "parking": "アピアと共用",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー阪急逆瀬川店。公式住所: 兵庫県宝塚市逆瀬川1-2-1",
+      "manager": "いかり阪急逆瀬川店店長藤谷　浩司 : 駅を降りてすぐの立地ですので雨でも駅からですと濡れずにご来店いただけます。また南北にロータリーがあり、バス、タクシーとのアクセスも便利です。当店は地下にありますが出口からすぐに駐輪場（月極）があるなど、阪急電車をご利用のお客様に、とっても便利な場所にあります。デリカコーナーでは出来立てのお料理をお作りしてお客様のお越しをお待ちいたしております。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/sakasegawa/sakasegawa_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/sakasegawa/",
+      "area": "N/A"
+    },
+    "塚口店": {
+      "coords": [
+        34.754282,
+        135.414315
+      ],
+      "address": "尼崎市塚口町1丁目15番地の8",
+      "phone": "06-6421-6074",
+      "parking": "41台",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー塚口店。公式住所: 兵庫県尼崎市塚口町1-15-8",
+      "manager": "いかり塚口店店長吉村　真典 : 店舗入り口付近や右奥の催事スペースでは、いつも試食販売や実演販売をご用意してお客様に味をお試しいただく事を心がけています。 また昭和36年にオープンしたいかり1号店としての自覚と責任を持ってお客様に心からのサービスとと満足いただける味の提案を行うよう努力していますので、何かありましたらお気軽にお声をおかけくださいませ。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/tsukaguchi/tsukaguchi_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/tsukaguchi/",
+      "area": "N/A"
+    },
+    "阪急伊丹店": {
+      "coords": [
+        34.779838,
+        135.413636
+      ],
+      "address": "伊丹市西台1丁目1番1号",
+      "phone": "072-770-6501",
+      "parking": "140台（駅ビル駐車場）※車高の高いお車、及び車幅の広い車は、一部ご利用できません。",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー阪急伊丹店。公式住所: 兵庫県伊丹市西台1-1-1",
+      "manager": "いかり阪急伊丹店店長坂井　喜和 : 伊丹店では楽しい旬の味をいつも実施できるよう心がけています。 肉、魚、寿司、野菜、果物など季節の美味しさをご用意しています。 また焼き立てのこだわりパンコーナー、素材重視のデリカテッセンなどいかりならではの美味しさが満載です。どうぞご利用ください。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/h_itami/h_itami_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/h_itami/",
+      "area": "N/A"
+    },
+    "豊中店": {
+      "coords": [
+        34.786355,
+        135.47835
+      ],
+      "address": "豊中市旭丘1番12",
+      "phone": "06-6840-6157",
+      "parking": "70台",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー豊中店。公式住所: 大阪府豊中市旭丘1-12",
+      "manager": "いかり豊中店店長 北村　拓也 : 豊中店はとても広々としておりますので、ゆっくりとお買い物ができるお店ですので商品も幅広く、多数の品を取り揃えております。 また、『ごはん処　米俵』では、いかりの味をお楽しみ頂く事ができます。お買い物の後のお昼御飯にどうぞ御利用下さい。 お客様にお喜び頂けるサービスを従業員一同努めてまいります。お気付きの点等ございましたら、お気軽に声をおかけ下さいませ。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/toyonaka/toyonaka_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/toyonaka/",
+      "area": "N/A"
+    },
+    "箕面店": {
+      "coords": [
+        34.832011,
+        135.469643
+      ],
+      "address": "箕面市箕面6丁目5番16号",
+      "phone": "072-724-3190",
+      "parking": "39台",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー箕面店。公式住所: 大阪府箕面市箕面6-5-16",
+      "manager": "いかり箕面店店長村上 俊幸 : より充実した売り場でお客様をお迎えします。入口付近の開放的な天井は、お客様から「まるでホテルのよう」と人気があります。商品の品揃えもさらに充実し、より美味しい品のご提供ができるようになりました。設備の面では、地下駐車場から直接エレベーターで店内へお越し頂けるようになったこともお客様からご好評をいただいています。 是非一度いかり箕面店へお越し下さいませ。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/minoh/MG_7513_360_280.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/minoh/",
+      "area": "N/A"
+    },
+    "王子店": {
+      "coords": [
+        34.802399,
+        135.521073
+      ],
+      "address": "大阪府吹田市山田西3丁目57-5",
+      "phone": "06-6876-3004",
+      "parking": "120台",
+      "hours": "9:30〜21:00",
+      "features": "いかりスーパー王子店。公式住所: 大阪府吹田市山田西3-57-5",
+      "manager": "いかり王子店店長中村　剛 : 平素より格別のお引き立てを賜り誠にありがとうございます。 この度、お客様によりお買い物をお楽しみいただける売場を目指してオープンいたしました。出来立ての美味しさを追求した充実のデリカコーナー、新しいイートラウンジなど、寿司やいかりの出来立てお料理をお楽しみいただけるコーナーを新設いたしました。これまでよりもさらに売り場を拡張した生鮮品、一般食品売り場もご用意いたしました。 お客様のご来店を心よりお待ち申し上げております。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/oji/360_280.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/oji/",
+      "area": "N/A"
+    },
+    "高槻店": {
+      "coords": [
+        34.868441,
+        135.614144
+      ],
+      "address": "高槻市真上町6丁目13番11号",
+      "phone": "072-698-0016",
+      "parking": "50台",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパー高槻店。公式住所: 大阪府高槻市真上町6-13-11",
+      "manager": "いかり高槻店店長小野寺　宏文 : 閑静な住宅街の中に位置する当店は、地域密着で大型店にはないきめ細やかなサービスと地域一番の品質、鮮度、サービスで、「さすがいかりスーパー」とお客様に心からお喜びいただけるお店作りを行って参ります。 お客様の御要望には出来る限り対応させていただきます。 お気軽にお声がけ下さいませ。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/takatsuki/takatsuki_store.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/takatsuki/",
+      "area": "N/A"
+    },
+    "JR大阪店": {
+      "coords": [
+        34.7024,
+        135.4959
+      ],
+      "address": "大阪市北区梅田3丁目1番1号",
+      "phone": "06-6348-2347",
+      "parking": "なし",
+      "hours": "7:30〜22:30",
+      "features": "いかりスーパーJR大阪店。公式住所: 大阪府大阪市北区梅田3-1-1",
+      "manager": "いかりJR大阪店店長加茂 繁樹 : 出来立てのデリカメニューをはじめ寿司、パンなどのすぐにお召し上がりいただけるメニューを多数ご用意。ワインやチーズ、直輸入商品などの品揃えも豊富です。その他いかりオリジナルのお手土産商品も多数ご用意していますのでどうぞご利用ください。駅前店として便利にご利用いただける充実したお店を目指して参ります。今後ともご愛顧賜りますようお願い申しあげます。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/jr_osaka/jr_osaka.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/jr_osaka/",
+      "area": "N/A"
+    },
+    "南海なんば店": {
+      "coords": [
+        34.66387,
+        135.500792
+      ],
+      "address": "大阪市中央区難波5丁目1番60号",
+      "phone": "06-6633-2288",
+      "parking": "なし",
+      "hours": "平日：10:00〜22:00日・祝：10:00〜21:00",
+      "features": "いかりスーパー南海なんば店. 公式住所: 大阪府大阪市中央区難波5-1-60",
+      "manager": "いかり南海なんば店店長後呂　謙 : 新しい大阪の魅力がいっぱい詰まったなんばスカイオ3階にオープンいたしました。 生鮮品はもとより各種いかりオリジナルの惣菜、出来立てのお寿司、デリカコーナーやワイン、お菓子、お手土産商品も充実しています。南海なんば駅に直結した便利さが魅力のいかり南海なんば店。お近くへお越しの際にはぜひお立ち寄りいただきますようご案内申し上げます。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/nankai_nanba/nankai_nanba1.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/nankai_nanba/",
+      "area": "N/A"
+    },
+    "豊中緑丘店": {
+      "coords": [
+        34.811411,
+        135.481529
+      ],
+      "address": "豊中市緑丘4丁目12番10号",
+      "phone": "06-6151-5615",
+      "parking": "31台（地下）",
+      "hours": "9:30～21:00",
+      "features": "いかりスーパー豊中緑丘店。公式住所: 豊中市緑丘4丁目12番10号",
+      "manager": "いかり豊中緑丘店店長橋田 友宏 : この度、5月17日に新しく豊中緑丘店をオープンさせていただきました。 地域のお客様のお役に立てますよう、厳選した生鮮品、自社で製造しておりますオリジナル商品をはじめ、出来立てのデリカ、寿司、お弁当など数多く品揃え致しております。 また、おくつろぎいただけるカフェスペースもご用意しておりますので、お買い物の合間にご利用いただきますようお願いいたします。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/toyonaka_midorigaoka/toyonaka_midorigaoka_store1.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/toyonaka_midorigaoka/",
+      "area": "N/A"
+    },
+    "ライクス常盤店": {
+      "coords": [
+        35.021266,
+        135.70196
+      ],
+      "address": "京都市右京区太秦京ノ道町10番地3",
+      "phone": "075-881-7110",
+      "parking": "32台",
+      "hours": "10:00〜21:00",
+      "features": "いかりスーパーライクス常盤店。公式住所: 京都府京都市右京区太秦京ノ道町10-3",
+      "manager": "いかりライクス常盤店店長田淵　裕 : 2017年5月にリニューアルオープンして以来、多くのお客様にご来店いただいております。充実した店舗、品揃えで、これからも京都の皆様にご満足いただける店作りを目指して参ります。 今後ともご愛顧賜りますようお願い申しあげます。",
+      "image_url": "https://www.ikarisuper.com/wp/wp-content/Cimy_User_Extra_Fields/tokiwa/360_280_1.jpg",
+      "detail_url": "https://www.ikarisuper.com/info/author/tokiwa/",
+      "area": "N/A"
+    }
+  },
+  "competitors": {
+    "ヤマダ梅田店\n(26/冬予定)": {
+      "coords": [
+        34.7017,
+        135.4964
+      ],
+      "address": "大阪府大阪市北区梅田3-1-1 (大丸梅田店B2F)",
+      "hours": "未定 (10:00 - 20:00想定)",
+      "area": "約2,640㎡ (約800坪)",
+      "parking": "ビル提携駐車場あり",
+      "features": "2026年冬開業予定。大阪府内初出店となる大型高品質スーパー。大丸梅田店の地下2階に位置し、いかりJR大阪店の高級こだわり食材需要への影響が最大級と警戒される。"
+    },
+    "ヤマダ宝塚店\n(27/春予定)": {
+      "coords": [
+        34.8047,
+        135.3492
+      ],
+      "address": "兵庫県宝塚市伊孑志4丁目135-3付近 (NTT社員寮跡地)",
+      "hours": "未定 (9:00 - 21:00想定)",
+      "area": "約3,300㎡ (敷地面積1,000坪超)",
+      "parking": "約100台（予定）",
+      "features": "2027年春開業予定。敷地面積1000坪を超えるメガ店舗で、こだわりオーガニック食材に強みを持つ。開業時にはいかり宝塚店および逆瀬川店から広域富裕層顧客を奪う懸念がある最重要警戒店。"
+    },
+    "オーケー下新庄店\n(26/08予定)": {
+      "coords": [
+        34.7435,
+        135.5225
+      ],
+      "address": "大阪府大阪市東淀川区下新庄4丁目21-1",
+      "hours": "8:30 - 21:30",
+      "area": "約1,500㎡ (450坪)",
+      "parking": "120台",
+      "features": "2026年8月27日開業予定。関西進出を加速するオーケーの最新店舗。圧倒的な価格競争力と独自総菜で広域から集客し、日常食需要を強力に奪う存在。"
+    },
+    "オーケー長吉店\n(26/11予定)": {
+      "coords": [
+        34.608,
+        135.562
+      ],
+      "address": "大阪府大阪市平野区長吉長原1丁目1-10",
+      "hours": "8:30 - 21:30",
+      "area": "約1,800㎡ (540坪)",
+      "parking": "150台",
+      "features": "2026年11月中旬開業予定。大阪南部エリアへの本格攻勢となる大型店舗。商圏が広く、休日のまとめ買い需要を大きく吸収するポテンシャルを持つ。"
+    },
+    "ヤマダストアー大丸梅田店": {
+      "coords": [
+        34.7017,
+        135.4964
+      ],
+      "address": "大阪府大阪市北区梅田3丁目1-1 大丸梅田店 地下2階",
+      "hours": "N/A (2026年冬オープン予定)",
+      "area": "約2,640㎡（売場およびバックヤードを含む）",
+      "parking": "大丸梅田店の提携駐車場を利用可能（詳細は大丸梅田店ウェブサイト参照）",
+      "features": "生産者とのつながりや商品へのこだわりを重視し、独自の目利きで厳選された高品質な食材やプライベートブランドを展開。食の価値観を提案する「食にこだわるスーパー」として、日常使いから特別なシーンまで幅広いニーズに対応予定。"
+    },
+    "阪急オアシスマルシェ豊中駅前店": {
+      "coords": [
+        34.786916,
+        135.463621
+      ],
+      "address": "大阪府豊中市玉井町1-1-1-200 エトレとよなか地下1階",
+      "hours": "9:00 - 22:00",
+      "area": "1429㎡ (432坪)",
+      "parking": "208台 (エトレとよなか地下駐車場と提携、2,000円以上の買い物で1時間無料)",
+      "features": "鮮度・品質・専門性を高めた価値訴求型の食品スーパー。「おひさん市」で近郊野菜を販売し、リサイクル資源の店頭回収も実施しています。"
+    },
+    "関西スーパー西郷店": {
+      "coords": [
+        34.730248,
+        135.573288
+      ],
+      "address": "大阪府守口市西郷通2-11-14",
+      "hours": "9:00 - 20:50",
+      "area": "約1,458㎡",
+      "parking": "58台",
+      "features": "周辺では大型店で駐車場が広く、100円ショップも併設。2026年7月3日に価格訴求型のデイリーマートにリニューアル予定で、ATMなどの設備も充実。"
+    },
+    "ライフ 遠里小野店": {
+      "coords": [
+        34.591079,
+        135.500599
+      ],
+      "address": "大阪府大阪市住吉区遠里小野7丁目48番1 外",
+      "hours": "7:00 - 翌2:00",
+      "area": "2,235㎡",
+      "parking": "46台",
+      "features": "大規模小売店舗として、お惣菜や店内で焼き上げるベーカリー「小麦の郷」、プライベートブランド商品などが充実している予定です。元ロイヤルホスト跡地に出店します。"
+    },
+    "食品館アプロ（新業態店）": {
+      "coords": [
+        34.4842973,
+        135.3905872
+      ],
+      "address": "大阪府泉北郡忠岡町忠岡東1-22-13 忠岡興産ビル内",
+      "hours": "9:00 - 21:00",
+      "area": "約1,178㎡",
+      "parking": "N/A",
+      "features": "EDLP（エブリディ・ロー・プライス）をコンセプトとし、店内商品は毎日低価格で提供。100円ショップ「Watts With」を併設し、キャッシュレス決済にも対応。"
+    },
+    "ライフ本山店": {
+      "coords": [
+        34.726367,
+        135.287631
+      ],
+      "address": "兵庫県神戸市東灘区本山南町6-10-28",
+      "hours": "9:30 - 24:00 (1F), 2F・ドラッグコーナーは21時閉店",
+      "area": "約4,100㎡",
+      "parking": "160台",
+      "features": "2026年2月改装オープン。時短・簡便商品、冷凍食品、惣菜、インストアベーカリーを拡充。オーガニック食品や地元兵庫県産品も豊富。"
+    },
+    "万代（新規店舗）": {
+      "coords": [
+        34.675999,
+        135.60389
+      ],
+      "address": "大阪府東大阪市荒本1-36-34ほか",
+      "hours": "7:00 - 24:00",
+      "area": "約1,563㎡",
+      "parking": "62台",
+      "features": "2026年9月オープン予定の新規スーパーマーケット。幅広い品揃えと便利な営業時間で地域住民の日常の買い物をサポートします。"
+    },
+    "ヤマダストアー大阪梅田店": {
+      "coords": [
+        34.7017041,
+        135.4963984
+      ],
+      "address": "大阪府大阪市北区梅田3丁目1-1 大丸梅田店 地下2階",
+      "hours": "2026年冬オープン予定（大丸梅田店の営業時間に準ずる見込み：10:00 - 20:00）",
+      "area": "約800坪（売場およびバックヤードを含む）",
+      "parking": "大丸梅田店の提携駐車場（サウスゲートビル地下駐車場など）",
+      "features": "兵庫県で人気のスーパー「ヤマダストアー」の大阪初出店。約800坪の地下2階フロアすべてを占める最大規模の店舗で、品質重視のこだわりの食材やプライベートブランド、生産者とつながる商品構成が特徴です。"
+    },
+    "バーガーキング 関西スーパー琵琶店": {
+      "coords": [
+        34.71158,
+        135.235004
+      ],
+      "address": "兵庫県神戸市灘区琵琶町3-5-19 関西スーパー琵琶 1F",
+      "hours": "9:00 - 21:00",
+      "area": "N/A",
+      "parking": "95台",
+      "features": "直火焼き100%ビーフパティの「ワッパー」が特長の大型本格バーガーを提供する店舗です。関西スーパー琵琶店1階に2026年6月30日オープンしました。"
+    },
+    "オーケー 高槻赤大路店": {
+      "coords": [
+        34.837366,
+        135.5839
+      ],
+      "address": "大阪府高槻市赤大路町38-1",
+      "hours": "N/A",
+      "area": "N/A",
+      "parking": "N/A",
+      "features": "高品質・Everyday Low Priceを掲げるディスカウントスーパーマーケット。大阪府内で7店舗目となり、国道171号線沿いのヤマダアウトレット高槻店跡地に開業予定。"
+    },
+    "バーガーキング 関西スーパー西冠店": {
+      "coords": [
+        34.8327856,
+        135.6223638
+      ],
+      "address": "大阪府高槻市西冠3-29-7 関西スーパー西冠 1階",
+      "hours": "9:00 - 20:00",
+      "area": "N/A",
+      "parking": "501台（関西スーパー西冠店共用）",
+      "features": "関西スーパー西冠店1階に2026年6月30日オープン。直火焼きの100%ビーフパティが特徴で、買い物ついでに気軽に本格バーガーを楽しめます。"
+    },
+    "関西スーパー デイリーマート西郷店": {
+      "coords": [
+        34.730248,
+        135.573288
+      ],
+      "address": "大阪府守口市西郷通2-11-14",
+      "hours": "9:00 - 20:50",
+      "area": "約1,458㎡",
+      "parking": "58台",
+      "features": "2026年7月3日リニューアルオープンした価格訴求型のデイリーマート。日常使いの食品を中心にお買い得を提供し、高効率運営を目指す。100円ショップや美容院も併設し、PayPayなど多様なキャッシュレス決済に対応。"
+    },
+    "ライフコーポレーション （仮称）ライフ豊崎店": {
+      "coords": [
+        34.7139,
+        135.4947
+      ],
+      "address": "大阪府大阪市北区豊崎六丁目2番1",
+      "hours": "7:00 - 翌2:00",
+      "area": "約1,600㎡",
+      "parking": "34台",
+      "features": "広範囲な営業時間と1,600㎡の店舗面積を持つ計画中の総合スーパー。環境に配慮した設計で、34台の駐車場と81台の駐輪場を備え、利便性を追求。"
+    }
+  }
+};
+
+    // HTMLエスケープ関数
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+    }
+
+    // 画像URLのセキュリティ検証 (http/https スキームのみ許可)
+    function safeImageUrl(url) {
+      if (!url) return '';
+      const trimmed = url.trim();
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return escapeHtml(trimmed);
+      }
+      return '';
+    }
+
+    const map = L.map('map', { zoomControl: false }).setView([34.764, 135.365], 13);
+    
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    const googleRoads = L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ja&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      attribution: '&copy; Google Maps'
+    }).addTo(map);
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    let activeMarkers = {};
+
+    function initMap() {
+      if(!STORES_DATA) return;
+      
+      // 既存マーカーのクリア
+      for (const key in activeMarkers) {
+        map.removeLayer(activeMarkers[key]);
+      }
+      activeMarkers = {};
+      
+      // 1. 今回のレポートで言及された競合名リストの作成
+      const mentionedComps = [];
+      if (REPORT_DATA && REPORT_DATA.details_rows) {
+        REPORT_DATA.details_rows.forEach(row => {
+          if (row.length > 1) {
+            mentionedComps.push(row[1]);
+          }
+        });
+      }
+      
+      // 2. 競合店舗のフィルタリングとプロット
+      function normalizeStoreName(str) {
+        if (!str) return "";
+        let s = str.split('\n')[0];
+        const words = ["スーパー", "ストアー", "ストア", "マーケット", "百貨店", "店", "(仮称)", "（仮称）", "大阪", "兵庫", "京都", "神戸"];
+        words.forEach(w => {
+          s = s.split(w).join("");
+        });
+        return s.replace(/[\s　]/g, "");
+      }
+
+      const plotCompetitors = {};
+      for (const [name, info] of Object.entries(STORES_DATA.competitors || {})) {
+        let isMentioned = false;
+        
+        if (REPORT_DATA.no_update) {
+          isMentioned = false;
+        } else {
+          isMentioned = mentionedComps.some(mName => {
+            const normDb = normalizeStoreName(name);
+            const normM = normalizeStoreName(mName);
+            let isMatched = false;
+            const minLen = 2;
+            for (let i = 0; i <= normDb.length - minLen; i++) {
+              const sub = normDb.substring(i, i + minLen);
+              if (normM.includes(sub)) {
+                isMatched = true;
+                break;
+              }
+            }
+            return isMatched;
+          });
+        }
+        
+        if (isMentioned) {
+          plotCompetitors[name] = info;
+        }
+      }
+      
+      // 3. いかり店舗の抽出
+      const plotIkari = {};
+      const compKeys = Object.keys(plotCompetitors);
+      
+      Object.assign(plotIkari, STORES_DATA.ikari_stores || {});
+      
+      // 4. マップ上にいかり店舗をプロット
+      for (const [name, info] of Object.entries(plotIkari)) {
+        if (!info.coords || (info.coords[0] === 0.0 && info.coords[1] === 0.0)) {
+          continue;
+        }
+
+        const pinIcon = L.divIcon({
+          html: `<svg viewBox="0 0 24 24" width="30" height="30" style="filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3));">
+                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#005bac" stroke="#C5A059" stroke-width="1.5"/>
+                 </svg>`,
+          className: 'custom-pin-icon',
+          iconSize: [30, 30],
+          iconAnchor: [15, 30]
+        });
+        const marker = L.marker(info.coords, { icon: pinIcon }).addTo(map);
+        
+        const validImgUrl = safeImageUrl(info.image_url);
+        const validDetailUrl = safeImageUrl(info.detail_url);
+
+        // プロットクリック時に詳細URLがあれば遷移、なければタブ連携
+        if (validDetailUrl) {
+          marker.on('click', (e) => {
+            if (e.originalEvent) {
+              e.originalEvent.stopPropagation();
+            }
+            window.open(validDetailUrl, '_blank', 'noopener,noreferrer');
+          });
+        } else {
+          marker.on('click', () => selectStoreFromMap(name, 'ikari'));
+        }
+
+        // ホバー時にフローティングカードを表示
+        marker.on('mouseover', (e) => {
+          if (e.originalEvent) {
+            e.originalEvent.stopPropagation();
+          }
+          showInfoCard(name, info, 'ikari');
+        });
+        
+        activeMarkers['ikari_' + name] = marker;
+      }
+      
+      // 5. マップ上に競合店舗をプロット + 半径2kmサークルを描画
+      for (const [name, info] of Object.entries(plotCompetitors)) {
+        if (!info.coords || (info.coords[0] === 0.0 && info.coords[1] === 0.0)) {
+          continue;
+        }
+
+        const fillColor = name.includes('ヤマダ') ? '#ff3b30' : '#ff9f0a';
+        
+        // 半径2km（2000m）の半透明サークルを描画
+        L.circle(info.coords, {
+          radius: 2000,
+          color: fillColor,
+          fillColor: fillColor,
+          fillOpacity: 0.08,
+          weight: 1.5,
+          dashArray: '5, 5'
+        }).addTo(map);
+        
+        const pinIcon = L.divIcon({
+          html: `<svg viewBox="0 0 24 24" width="26" height="26" style="filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3));">
+                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="${fillColor}" stroke="#fff" stroke-width="1.5"/>
+                 </svg>`,
+          className: 'custom-pin-icon',
+          iconSize: [26, 26],
+          iconAnchor: [13, 26]
+        });
+        const marker = L.marker(info.coords, { icon: pinIcon }).addTo(map);
+        
+        // ホバー時にフローティングカードを表示
+        marker.on('mouseover', (e) => {
+          if (e.originalEvent) {
+            e.originalEvent.stopPropagation();
+          }
+          showInfoCard(name, info, 'comp');
+        });
+        
+        marker.on('click', () => selectStoreFromMap(name, 'comp'));
+        activeMarkers['comp_' + name] = marker;
+      }
+      
+      // 6. 地図の自動ズーム/センタリング調整
+      const allCoords = [];
+      Object.values(plotIkari).forEach(info => allCoords.push(info.coords));
+      Object.values(plotCompetitors).forEach(info => allCoords.push(info.coords));
+      if (allCoords.length > 0) {
+        const bounds = L.latLngBounds(allCoords);
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+
+      // 地図の何もない場所をクリックした時にカードを非表示にする
+      map.on('click', () => {
+        hideInfoCard();
+      });
+    }
+
+    function selectStoreFromMap(name, type) {
+      if (type === 'ikari') {
+        switchTab('tab-influence');
+        const cards = document.querySelectorAll('.influence-card');
+        cards.forEach(c => {
+          if(c.innerText.includes(name)) {
+            c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            c.click();
+          }
+        });
+      }
+    }
+
+    function selectCard(idx, coords) {
+      document.querySelectorAll('.influence-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('impact-card-' + idx).classList.add('selected');
+      if(coords) {
+        map.setView(coords, 14, { animate: true });
+      }
+    }
+
+    function initData() {
+      if(!REPORT_DATA) return;
+      
+      if(REPORT_DATA.no_update) {
+        // 1. 結論
+        document.getElementById('conclusion-text').innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+            <i class="fa-solid fa-circle-info" style="font-size: 48px; color: var(--accent); margin-bottom: 15px; display: block;"></i>
+            <p style="font-size: 16px; font-weight: 600;">本日の調査において、前日からの周辺環境（競合の新規出店・改装計画・その他動向）の更新情報はありませんでした。</p>
+            <p style="font-size: 13px; margin-top: 8px;">過去に登録された競合店およびいかりスーパーの位置関係は右側のマップで確認できます。</p>
+          </div>
+        `;
+        
+        // 2. スタッツ
+        document.getElementById('stat-open').innerText = "0";
+        document.getElementById('stat-close').innerText = "0";
+        document.getElementById('stat-rest').innerText = "0";
+        
+        // 3. テーブルヘッダとボディ
+        document.getElementById('table-headers-tr').innerHTML = `<th>地域</th><th>店舗名</th><th>時期</th><th>状態</th><th>影響</th><th>詳細</th>`;
+        document.getElementById('table-body').innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted); font-weight: 500;">
+              更新された競合情報はありません
+            </td>
+          </tr>
+        `;
+        
+        // 4. 影響分析
+        document.getElementById('influence-cards-container').innerHTML = `
+          <div style="background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 30px; text-align: center; color: var(--text-muted);">
+            <p style="font-weight: 600;">影響を受ける店舗はありません</p>
+            <p style="font-size: 12px; margin-top: 5px;">本日の周辺環境更新情報が無いか、または現在影響分析すべき新規の競合動向がありません。</p>
+          </div>
+        `;
+        
+        // 5. 参照ソース
+        document.getElementById('sources-container').innerHTML = `
+          <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+            新規の参照ソースニュースはありません
+          </div>
+        `;
+        return;
+      }
+      
+      // Conclusion
+      if(REPORT_DATA.conclusion) {
+        document.getElementById('conclusion-text').innerHTML = REPORT_DATA.conclusion.split('\n').map(l => {
+          const cleanLine = l.replace(/^[*\\-]\s*/, '').trim();
+          return `<p style="margin-bottom:8px;"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>${escapeHtml(cleanLine)}</p>`;
+        }).join('');
+      }
+
+      // Details Table
+      if(REPORT_DATA.details_header && REPORT_DATA.details_rows) {
+        document.getElementById('table-headers-tr').innerHTML = REPORT_DATA.details_header.map(h => `<th>${escapeHtml(h)}</th>`).join('');
+        const regions = new Set();
+        let statOpen = 0, statClose = 0, statRest = 0;
+        
+        REPORT_DATA.details_rows.forEach(r => {
+          if (!r || r[0] === ':---' || r[0].includes('---')) return; // アライメント行をスキップ
+          regions.add(r[0]);
+          const t = r[3] || '';
+          if(t.includes('新規') || t.includes('開店') || t.includes('出店')) statOpen++;
+          else if(t.includes('閉店')) statClose++;
+          else statRest++;
+        });
+
+        document.getElementById('stat-open').innerText = statOpen;
+        document.getElementById('stat-close').innerText = statClose;
+        document.getElementById('stat-rest').innerText = statRest;
+
+        regions.forEach(r => {
+          const opt = document.createElement('option'); opt.value = r; opt.innerText = r;
+          document.getElementById('filter-region').appendChild(opt);
+        });
+
+        renderTable();
+      }
+
+      // Impact Analysis
+      if(REPORT_DATA.impact_analysis) {
+        const lines = REPORT_DATA.impact_analysis.split('\n');
+        let html = '';
+        let currentIdx = 0;
+        lines.forEach(l => {
+          if(l.match(/^\d+\./)) {
+            const name = l.replace(/^\d+\.\s*/, '').replace(/\*/g, '');
+            let coordsStr = 'null';
+            if(STORES_DATA && STORES_DATA.ikari_stores) {
+              const info = STORES_DATA.ikari_stores[name.replace('いかり', '') + '店'] || STORES_DATA.ikari_stores[name];
+              if(info) coordsStr = JSON.stringify(info.coords);
+            }
+            html += `<div class="influence-card" id="impact-card-${currentIdx}" onclick="selectCard(${currentIdx}, ${escapeHtml(coordsStr)})"><div class="card-header">${escapeHtml(name)}</div><div class="card-body">`;
+            currentIdx++;
+          } else if(l.trim().startsWith('*')) {
+            html += `<p style="margin-top:6px;">&bull; ${escapeHtml(l.replace(/^[*\\-]\s*/, ''))}</p>`;
+          }
+          if(l.trim() === '' && currentIdx > 0) {
+            html += `</div></div>`;
+          }
+        });
+        document.getElementById('influence-cards-container').innerHTML = html;
+      }
+
+      // Sources
+      if(REPORT_DATA.sources) {
+        document.getElementById('sources-container').innerHTML = REPORT_DATA.sources.split('\n').filter(l => l.trim()).map((l, i) => {
+          const cleanLine = l.replace(/^[*\\-]\s*/, '').trim();
+          const match = cleanLine.match(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/);
+          let title = cleanLine;
+          let linkHtml = '';
+          if (match) {
+            const linkText = match[1];
+            const url = match[2];
+            const safeUrl = (url.startsWith('http://') || url.startsWith('https://')) ? encodeURI(url) : '#';
+            
+            // リンクの表記テキスト自体がURLで、その手前にテキストが存在する場合、
+            // 手前のテキストをリンクタイトルとして流用する
+            const matchIndex = cleanLine.indexOf(match[0]);
+            if ((linkText.startsWith('http://') || linkText.startsWith('https://')) && matchIndex > 0) {
+              title = cleanLine.substring(0, matchIndex).trim().replace(/[.\s。]+$/, '');
+            } else {
+              title = linkText;
+            }
+            
+            linkHtml = `<div class="source-links"><a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> 記事を読む</a></div>`;
+          }
+          return `
+            <div class="source-card">
+              <div class="source-num">Source #${i+1}</div>
+              <div class="source-title">${escapeHtml(title)}</div>
+              ${linkHtml}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderTable() {
+      const q = document.getElementById('table-search').value.toLowerCase();
+      const r = document.getElementById('filter-region').value;
+      const t = document.getElementById('filter-type').value;
+      
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      
+      (REPORT_DATA.details_rows || []).forEach(row => {
+        if (!row || row[0] === ':---' || row[0].includes('---')) return; // アライメント行をスキップ
+        if(r !== 'all' && row[0] !== r) return;
+        
+        // 状態分類のフィルタリング (集計条件と完全同期)
+        const isOp = row[3].includes('新規') || row[3].includes('開店') || row[3].includes('出店');
+        const isCl = row[3].includes('閉店');
+        if(t === 'open' && !isOp) return;
+        if(t === 'close' && !isCl) return;
+        if(t === 'rest' && (isOp || isCl)) return;
+        
+        if(q && !row.some(c => c.toLowerCase().includes(q))) return;
+        
+        const tr = document.createElement('tr');
+        row.forEach((cell, i) => {
+          let td = document.createElement('td');
+          if(i === 3) {
+            if(cell.includes('新規') || cell.includes('開店')) td.innerHTML = `<span class="badge-op">${escapeHtml(cell)}</span>`;
+            else if(cell.includes('閉店')) td.innerHTML = `<span class="badge-cl">${escapeHtml(cell)}</span>`;
+            else td.innerHTML = `<span class="badge-rw">${escapeHtml(cell)}</span>`;
+          } else td.innerText = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-tab') === tabId) btn.classList.add('active');
+      });
+      document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab'))));
+    document.getElementById('table-search').addEventListener('input', renderTable);
+    document.getElementById('filter-region').addEventListener('change', renderTable);
+    document.getElementById('filter-type').addEventListener('change', renderTable);
+    document.querySelectorAll('.stat-box').forEach(box => {
+      box.addEventListener('click', () => {
+        document.getElementById('filter-type').value = box.getAttribute('data-type');
+        switchTab('tab-details');
+        renderTable();
+      });
+    });
+
+    // 全画面表示（ポップアウト）制御
+    const contentPanel = document.querySelector('.content-panel');
+    const expandContentBtn = document.getElementById('expand-content-btn');
+    expandContentBtn.addEventListener('click', () => {
+      const isFull = contentPanel.classList.toggle('fullscreen');
+      expandContentBtn.innerHTML = isFull ? '<i class="fa-solid fa-compress"></i>' : '<i class="fa-solid fa-expand"></i>';
+      expandContentBtn.title = isFull ? '通常表示に戻す' : '全画面表示';
+    });
+
+    const mapContainer = document.getElementById('map-container');
+    const expandMapBtn = document.getElementById('expand-map-btn');
+    expandMapBtn.addEventListener('click', () => {
+      const isFull = mapContainer.classList.toggle('fullscreen');
+      expandMapBtn.innerHTML = isFull ? '<i class="fa-solid fa-compress"></i>' : '<i class="fa-solid fa-expand"></i>';
+      expandMapBtn.title = isFull ? '通常表示に戻す' : '全画面表示';
+      
+      // Leafletマップのサイズ更新を適用
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    });
+
+    // フローティングカード表示制御関数
+    function showInfoCard(name, info, type) {
+      const card = document.getElementById('info-card');
+      if (!card) return;
+
+      // プロットの画面上の位置から左右どちらに表示するかを判定
+      let isRightSide = true; 
+      if (info.coords && info.coords.length === 2) {
+        try {
+          const containerPoint = map.latLngToContainerPoint(L.latLng(info.coords[0], info.coords[1]));
+          const mapWidth = map.getSize().x;
+          isRightSide = containerPoint.x >= mapWidth / 2;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      if (isRightSide) {
+        card.classList.remove('pos-right');
+        card.classList.add('pos-left');
+      } else {
+        card.classList.remove('pos-left');
+        card.classList.add('pos-right');
+      }
+
+      const imgWrapper = document.getElementById('card-img-wrapper');
+      const img = document.getElementById('card-img');
+      const title = document.getElementById('card-title');
+      
+      const addressRow = document.getElementById('card-address-row');
+      const address = document.getElementById('card-address');
+      
+      const phoneRow = document.getElementById('card-phone-row');
+      const phone = document.getElementById('card-phone');
+      
+      const parkingRow = document.getElementById('card-parking-row');
+      const parking = document.getElementById('card-parking');
+      
+      const hoursRow = document.getElementById('card-hours-row');
+      const hours = document.getElementById('card-hours');
+
+      const areaRow = document.getElementById('card-area-row');
+      const area = document.getElementById('card-area');
+      
+      const desc = document.getElementById('card-desc');
+      const manager = document.getElementById('card-manager');
+
+      title.textContent = name || '';
+      if (type === 'comp') {
+        title.style.color = name.includes('ヤマダ') ? '#ff3b30' : '#ff9f0a';
+      } else {
+        title.style.color = 'var(--primary)';
+      }
+
+      const validImgUrl = safeImageUrl(info.image_url);
+      if (validImgUrl) {
+        img.src = validImgUrl;
+        img.alt = name || '';
+        imgWrapper.style.display = 'block';
+      } else {
+        imgWrapper.style.display = 'none';
+        img.src = '';
+      }
+
+      if (info.address) {
+        address.textContent = info.address;
+        addressRow.style.display = 'block';
+      } else {
+        addressRow.style.display = 'none';
+      }
+
+      if (info.phone) {
+        phone.textContent = info.phone;
+        phoneRow.style.display = 'block';
+      } else {
+        phoneRow.style.display = 'none';
+      }
+
+      if (info.parking) {
+        parking.textContent = info.parking;
+        parkingRow.style.display = 'block';
+      } else {
+        parkingRow.style.display = 'none';
+      }
+
+      if (info.hours) {
+        hours.textContent = info.hours;
+        hoursRow.style.display = 'block';
+      } else {
+        hoursRow.style.display = 'none';
+      }
+
+      if (info.area) {
+        area.textContent = info.area;
+        areaRow.style.display = 'block';
+      } else {
+        areaRow.style.display = 'none';
+      }
+
+      if (info.features) {
+        desc.textContent = info.features;
+        desc.style.display = 'block';
+      } else {
+        desc.style.display = 'none';
+      }
+
+      if (info.manager) {
+        manager.textContent = `店長からの一言:\n${info.manager}`;
+        manager.style.display = 'block';
+      } else {
+        manager.style.display = 'none';
+      }
+
+      card.classList.add('active');
+    }
+
+    function hideInfoCard() {
+      const card = document.getElementById('info-card');
+      if (card) {
+        card.classList.remove('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      initData();
+
+      // フローティングカード内のスクロールやクリックが背後の地図に伝播するのを防ぐ
+      const card = document.getElementById('info-card');
+      if (card) {
+        L.DomEvent.disableScrollPropagation(card);
+        L.DomEvent.disableClickPropagation(card);
+      }
+    });
+  </script>
+</body>
+</html>
