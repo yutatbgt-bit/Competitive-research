@@ -1,32 +1,36 @@
 ## a) 【結論】
-いかりスーパー既存店舗の周辺環境において、2026年7月2日（調査日）以降に以下の競合動向が新たに確認されました。
+いかりスーパー既存店舗の周辺環境において、2026年7月3日（調査日）以降に以下の競合動向が新たに確認されました。
 
-*   **関西スーパー**は、尼崎市のフェスタ立花店でネットスーパーのサービスを開始しました。いかり塚口店に影響を与える可能性があります。
-*   **関西スーパー**は、神戸市東灘区の西郷店をリニューアルオープン予定であり、いかり摂津本山駅前店に影響を与える可能性があります。
-*   **ヤマダストアー**は、2026年12月に大阪市の大丸梅田店に新規出店を予定しており、いかりJR大阪店と直接競合します。
-*   **ヤマダストアー**は、2027年春に宝塚市に新規出店を予定しており、いかり宝塚店といかり阪急逆瀬川店に影響を与える可能性があります。
+*   **関西スーパー**は、神戸市灘区の西郷店を2026年7月3日にリニューアルオープンし、いかり六甲店に影響を与える可能性があります。
+*   **オーケー**は、大阪府高槻市に「高槻赤大路店」を2026年8月下旬に新規出店予定であり、いかり高槻店に影響を与える可能性があります。
+*   **ヤマダストアー**は、大阪市北区の大丸梅田店地下2階に「大阪梅田店」を2026年12月中に新規出店予定であり、いかりJR大阪店に影響を与える可能性があります。
+*   **ヤマダストアー**は、兵庫県宝塚市に「宝塚店」を2027年春に新規出店予定であり、いかり宝塚店、いかり阪急逆瀬川店に影響を与える可能性があります。
 
 ## b) 【詳細】
 
 | エリア | 競合店舗名 | 時期 | 状態 | 影響店舗 | 影響レベル | 詳細説明 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 兵庫県尼崎市 | 関西スーパー フェスタ立花店 | 2026年7月1日 | ネットスーパー開業 | いかり塚口店 | 中 | 兵庫県尼崎市立花町に位置する関西スーパーフェスタ立花店にて、ネットスーパーのサービスが開始されました。いかり塚口店（兵庫県尼崎市塚口町1丁目15番地の8）から約1.71kmの距離にあり、利便性を追求する顧客層への影響が考えられます。 |
-| 兵庫県神戸市東灘区 | 関西スーパー西郷店 | 2026年7月3日 | リニューアルオープン | いかり摂津本山駅前店 | 中 | 兵庫県神戸市東灘区青木に位置する関西スーパー西郷店がリニューアルオープンします。いかり摂津本山駅前店（神戸市東灘区岡本1丁目2-18）から約1.33kmの距離にあり、品揃えや店舗体験の向上による顧客流出の可能性があります。 |
-| 大阪府大阪市北区 | ヤマダストアー大阪梅田店 | 2026年12月 | 新規出店 | いかりJR大阪店 | 高 | 大丸梅田店地下2階食品フロアにヤマダストアーが新規出店します。いかりJR大阪店（大阪府大阪市北区梅田3丁目1番1号）と同じJR大阪駅ビル内に位置するため、直接的な競合となり、顧客獲得競争が激化すると予想されます。 |
-| 兵庫県宝塚市 | ヤマダストアー宝塚店 | 2027年春 | 新規出店 | いかり宝塚店、いかり阪急逆瀬川店 | 中 | 兵庫県宝塚市伊孑志4丁目（NTT社員寮跡地）にヤマダストアーが新規出店を予定しています。いかり宝塚店（兵庫県宝塚市南口1丁目17番18号）から約0.79km、いかり阪急逆瀬川店（兵庫県宝塚市逆瀬川1丁目2番1号）から約0.17kmと非常に近接しており、地域顧客の獲得に向けた競争が激化すると考えられます。 |
+| 兵庫県神戸市灘区 | 関西スーパー西郷店 | 2026年7月3日 | リニューアルオープン | いかり六甲店 | 中 | 神戸市灘区に位置する関西スーパー西郷店が、2026年7月3日にリニューアルオープンしました。いかり六甲店（神戸市灘区宮山町2丁目6番15号）から約1km圏内と近接しており、改装による顧客体験向上や品揃え強化がいかり六甲店の顧客に影響を与える可能性があります。 |
+| 大阪府高槻市 | オーケー高槻赤大路店 | 2026年8月下旬 | 新規出店 | いかり高槻店 | 中 | オーケーは、大阪府高槻市に「高槻赤大路店」を2026年8月下旬にオープンする予定です。いかり高槻店（大阪府高槻市真上町6丁目13番11号）から2km圏内と推測され、高品質・Everyday Low Priceを掲げるディスカウントスーパーの新規出店は、価格競争の激化を招く可能性があります。 |
+| 大阪府大阪市北区 | ヤマダストアー大阪梅田店 | 2026年12月中 | 新規出店 | いかりJR大阪店 | 高 | 兵庫県播磨地域を中心に展開する「ヤマダストアー」が、大阪市の大丸梅田店地下2階に「大阪梅田店」として2026年12月中に新規出店を予定しています。いかりJR大阪店（大阪府大阪市北区梅田3丁目1番1号）と同一施設内（大丸梅田店はJR大阪駅ビル隣接）での出店であり、デパ地下という共通の立地で直接的な競合となるため、影響は大きいと見られます。 |
+| 兵庫県宝塚市 | ヤマダストアー宝塚店 | 2027年春 | 新規出店 | いかり宝塚店、いかり阪急逆瀬川店 | 中 | ヤマダストアーは、兵庫県宝塚市に「宝塚店」を2027年春にオープンする予定です。いかり宝塚店（兵庫県宝塚市南口1丁目17番18号）およびいかり阪急逆瀬川店（兵庫県宝塚市逆瀬川1丁目2番1号）と同一市内での出店であり、周辺地域の顧客獲得競争が激化する可能性があります。 |
 
 ## c) 【地図分析】
-今回確認された競合動向は、いかりスーパー既存店舗が集中する阪神間（尼崎市、神戸市東灘区、宝塚市、大阪市北区）に集中しており、各店舗から半径2km圏内の至近距離で発生しています。特にヤマダストアー大阪梅田店は、いかりJR大阪店と同一ビル内での出店となり、地理的に最も密接な競合となります。ヤマダストアー宝塚店も、いかり宝塚店といかり阪急逆瀬川店のごく近隣への出店であり、高級スーパーを志向する両社にとって顧客の奪い合いが顕著になるでしょう。関西スーパーのネットスーパー開業と店舗改装も、既存顧客の利便性向上や新たな顧客体験の提供を通じて、周辺いかり店舗への潜在的な影響を及ぼします。
+*   今回リニューアルオープンした関西スーパー西郷店は、いかり六甲店から南西に約1kmほどの距離に位置する神戸市灘区西郷にあります。幹線道路沿いに位置し、地域住民のアクセスが良い立地です。
+*   オーケー高槻赤大路店は、いかり高槻店から南西方向の高槻市赤大路町に位置すると想定されます。既存のいかり高槻店は住宅街の中に立地しており、オーケーの出店は広範囲からの集客が予想されます。
+*   ヤマダストアー大阪梅田店は、いかりJR大阪店と同じく梅田の中心部、JR大阪駅に直結する大丸梅田店への出店です。両店舗は非常に近い距離にあり、デパートの地下食品フロアという形態も類似しているため、顧客層が重複する可能性が高いです。
+*   ヤマダストアー宝塚店は、いかり宝塚店およびいかり阪急逆瀬川店と同じ宝塚市内に計画されており、具体的な位置は不明ですが、既存のいかり店舗から2km圏内に位置する可能性が高いです。特にいかり宝塚店は駅前に立地しており、新たな高級スーパーの参入は直接的な競合となるでしょう。
 
 ## d) 【影響分析】
-*   **いかりJR大阪店**：ヤマダストアー大阪梅田店の新規出店は、特に大きな影響をもたらすと考えられます。両社とも高品質な食品を取り扱うスーパーであり、立地がほぼ同一であるため、客層の重複が予想されます。品揃えの差別化や店内体験の向上が急務となります。
-*   **いかり宝塚店、いかり阪急逆瀬川店**：ヤマダストアー宝塚店の新規出店により、既存のいかり店舗は顧客の流出リスクに直面します。特にいかり阪急逆瀬川店は至近距離に位置しており、競合による価格競争やサービス競争が激しくなる可能性があります。
-*   **いかり塚口店**：関西スーパーフェスタ立花店のネットスーパー開業は、いかり塚口店周辺のデジタルチャネルを利用する顧客層の奪い合いに繋がる可能性があります。いかりスーパーもオンラインサービス強化の検討が必要かもしれません。
-*   **いかり摂津本山駅前店**：関西スーパー西郷店のリニューアルオープンは、店舗の魅力向上を通じて周辺顧客の来店を促す可能性があります。いかり摂津本山駅前店としては、自店舗の強み（品揃え、サービス、雰囲気など）を再確認し、顧客への訴求力を高めることが重要です。
+*   **いかり六甲店**：関西スーパー西郷店のリニューアルは、特に品揃えや売場の鮮度感で差別化を図るいかり六甲店にとって、新たな競争圧力となります。改装により、関西スーパーが既存顧客の維持に加え、新たな顧客層を獲得しようとする動きにいかりは注意が必要です。
+*   **いかり高槻店**：オーケー高槻赤大路店の新規出店は、いかり高槻店に大きな影響を与える可能性があります。オーケーの「高品質・Everyday Low Price」戦略は、日常使いの顧客層にとって魅力が大きく、いかりが高槻店でターゲットとする客層の一部が流出する恐れがあります。いかりは、品揃えの独自性や、よりパーソナルな顧客サービスを一層強化する必要があります。
+*   **いかりJR大阪店**：ヤマダストアー大阪梅田店の新規出店は、いかりJR大阪店にとって非常に強力な競合となります。ヤマダストアーは「自然食品・オーガニック製品」に強みを持つ高級スーパーであり、いかりが持つ「高品質・こだわり」のイメージと重なる部分が多いため、顧客の奪い合いが直接的に発生するでしょう。駅直結という立地の優位性を活かしつつ、品揃えのさらなる差別化や、独自のサービス展開が求められます。
+*   **いかり宝塚店、いかり阪急逆瀬川店**：ヤマダストアー宝塚店の新規出店は、両店舗にとって新たな競合となり、特に高級食材やこだわりの品を求める顧客層において競合が激しくなると予想されます。いかりとしては、地域に根差した品揃えの強化や、顧客との関係構築をより一層深めることで、顧客ロイヤルティの維持に努める必要があります。
 
 ## e) 【参照ソース】
-*   [兵庫:「ヤマダストアー」大阪進出、大丸梅田店「デパ地下」に店舗では最大級の規模でオープン…生鮮食品・店内調理品も - 読売新聞](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFiHnHnUEQZqHQwVCXKhpXCPE_3ITGCgBQ5eekvPcRYxrYLhPUs5vKJmkKa3DW6u6JNOlA2b1322odQJTUmwTgZkRXRrprlWeRMz6b1-RVTlxXLhEO5E7x_xKnMmQMlIVK8-HUp4fBl-4KDajooAvYEZGrxF7w6HhqLCg==)
-*   [関西スーパーnews｜7/1｢フェスタ立花店｣でネットスーパー開業 - 流通スーパーニュース - 商人舎](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQExtImCt53v0kAXg0d8sFr211Vol8QlIV4RxDKzxpq6nMVfHtT7ugqNmREa94Nm-gnsp9Dy285rC78ImnyBXcK1myH48aDhrcpBPJj8naJ3UvUsokNt_j1Ie0INq-PSp93kx6cdk0OrdA==)
-*   [ヤマダストアー - Wikipedia](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG5ooYlhNCtqBnUXmc7UIdqS1JOdCOOQaihgvu_6krSF5GpwwTIvqXTJnwdwmiN3evNTjoALfuFbSzGmC9Y68uRXMNbgAWWET5ro6aBXfRvtBKnZ5F723ITVDbPspViNGcVrevXh5np40RBu6I1FSKlsvHAj-KhrKuc3ccyjXsJcBVw0_L7bX2qhIA__0kODgTsyoCet5LE)
-*   [ヤマダストアー宝塚店 2027年春開業！テナントは？最新情報も！ - 出店ウォッチ](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGyiCKwBwCfq-gHFKSjm7HKdhx33NU8Rh_AxZ3gF_MOLKNKgiJqSfqStdra8WlgdXcdiN-IeYEhZPKix-CB8Y5pLDvmnqsKJ5oFuq7zX0J_IkaLHUvRTYYc2bZMjRRv1Ts=)
-*   [お知らせ｜関西スーパー～いつも暮らしの近くにいます～​](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEIFfZNV8FHbBNx-VWk3ThRIim_cpr7GzHUMetalx9SkZFgn0CFC37OtCVRqnK2jOrB2OLzpw0e37OgrbP7oBLiU5nQqlKExZmwTvEAv5tIRw8yV065BsAP7fjvI-sgL5Y=)
+*   [兵庫:「ヤマダストアー」大阪進出、大丸梅田店「デパ地下」に店舗では最大級の規模でオープン…生鮮食品・店内調理品も - 読売新聞](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEKVNjDHs6WrAa6AwgArxnfDf5tXFf4a9B2vTcNpNCYK3zHdADmcZBufSCHT_UL6yT0rTLZdclkrkZeP025zVlgt_hlHth0UwuTp7tgfWtc-C0rxJEZ1wOJ5zwnUuH0zatr1YMWmrUx4iAo1xTCQZl5_pKZrxh39vveQCc=)
+*   [【大阪に初出店】兵庫で人気のスーパー「ヤマダストアー」が梅田のデパ地下に登場 - リビングWeb](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGWzId6B0QQgfAHf5BoQvX4DIGYQpm8SF8xG5mAj7fzq99Bfzweuq2DWm1VUGNMPp7W6vZFioqh4UEMlyYpyMujF2MuxDlNUXc6p40sAMUUhWZ3KhrMYm9YrjAl7hT_KWl7kMiPL9_DdyU87WSzuJkI)
+*   [ディスカウント・スーパーマーケット「オーケー」 大阪府での展開を加速！5月に「大東新田西町店」「豊中穂積店」を連続出店 ～2026年度は大阪府内に計7店舗の出店を予定](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGyOI7W6qFQ7AJtjfD-8HbrYoG5Ny3oYfByQFlC7MGdWBKwCnvk8vG4JfTktEJAUiUZNx-kk3lGEtsAkJ4NSyT3p_UuXZ68p-iLwOKIZnKS7P6qw3NrpFqgxJMSSSEkgeeuxHVDoc2E82Y=)
+*   [お知らせ｜関西スーパー～いつも暮らしの近くにいます～​](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEu4z00OiycIgDYyOcFV18wih_s48LVzxm4dFIjl9J1htiaSBvYaLPCKMXYeHUvL_B3uZ7H8daOUFvp0GXpLHIbBP6vYl3KldSVhm7IiTzUrpFqc2NDZcYOxD22KufzcQdk)
+*   [ヤマダストアー - Wikipedia](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH9aEu7tE1z-fdoyfRFEx-UJrYoLL5dZLXsst5ijOQ3yvKiNoXN3kMde0PKzkd-JfGzBxHbDjp-yRcLgpL9-mJ0Dvo0suYTiKeX2ktZVXgDJiq8iHM4Q6nGEWlREmXuzYc1vM4jXh6yeFdOrS8eCecu-nSOpB1qFcFyAvDOS9efHtu4An3EnD8PF0YpLnjw_qjK6NPokif7eQ==)
+*   [宝塚市の敷地１・１㌶超に商業店舗を計画／２６年２月に着工／ヤマダストアー | 建設ニュース](https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFf2T2qyZqNqKQI_s-GCKWrjgpTT0ia1PgEnVTnk3flaoiiFPuMqA797HbYNBXZFOmQYHYtWW0lv6AtbmYGtWfJxk86U_T_z1cpEyLmtiwd3U4JagIu46bUhe8dZpiUT)
