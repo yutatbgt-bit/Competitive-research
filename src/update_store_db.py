@@ -145,7 +145,7 @@ def clean_store_name(name):
     return n.strip()
 
 def update_db():
-    db_path = "stores_db.json"
+    db_path = "data/stores_db.json"
     if not os.path.exists(db_path):
         print(f"Error: {db_path} not found.")
         return

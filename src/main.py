@@ -750,7 +750,7 @@ def main():
     pptx_path = f"report/{today_str}_competitive_report_{mode}.pptx"
     map_image_path = f"report/{today_str}_competitive_map_{mode}.png"
     map_html_path = f"report/{today_str}_competitive_map_{mode}.html"
-    db_path = "stores_db.json"
+    db_path = "data/stores_db.json"
     ikari_config_path = "../ikari_map/config.md"
     
     if not os.path.exists(md_path):
@@ -833,7 +833,7 @@ def main():
         generate_visual_map(map_image_path, filtered_ikari, filtered_comp)
     
     # 2. レポート統合型HTMLダッシュボードの自動生成
-    generate_dynamic_web_page(map_html_path, db_data, md_path, "dashboard_template.html")
+    generate_dynamic_web_page(map_html_path, db_data, md_path, "templates/dashboard_template.html")
     
     # 3. PowerPoint生成（地図画像をスライドに挿入）
     os.makedirs(os.path.dirname(pptx_path), exist_ok=True)
@@ -850,7 +850,7 @@ def main():
     # レポート生成の最終成功日を記録
     try:
         from datetime import datetime
-        last_success_path = os.path.join(os.path.dirname(pptx_path), "last_success.txt")
+        last_success_path = os.path.join(os.path.dirname(os.path.dirname(pptx_path)) or '.', "last_success.txt")
         with open(last_success_path, "w", encoding="utf-8") as f:
             f.write(datetime.now().strftime("%Y-%m-%d"))
         print(f"Last success date written to: {last_success_path}")

@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 # プロジェクトルートの.envからロード
 load_dotenv()
 
-db_path = "stores_db.json"
-report_path = "competitive_report.md"
+db_path = "data/stores_db.json"
+report_path = "docs/competitive_report.md"
 
 def normalize_name(name):
     """
@@ -107,13 +107,20 @@ def main():
         print("GEMINI_API_KEY not found in environment. Skipping competitor auto-lookup.")
         return
 
-    # レポートから競合店舗名を抽出
-    report_comps = extract_competitors_from_report(report_path)
+    # A/B両方のレポートから競合店舗名を抽出してマージ
+    report_paths = ["report/competitive_report_within_2km.md", "report/competitive_report_no_limit.md"]
+    report_comps = []
+    for r_path in report_paths:
+        comps = extract_competitors_from_report(r_path)
+        if comps:
+            report_comps.extend(comps)
+    report_comps = list(set(report_comps))
+
     if not report_comps:
-        print("No competitors found in the report detail table.")
+        print("No competitors found in the report detail tables.")
         return
 
-    print(f"Found competitors in report: {report_comps}")
+    print(f"Found competitors in reports: {report_comps}")
 
     # データベースのロード
     if not os.path.exists(db_path):
