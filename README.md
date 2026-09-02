@@ -53,6 +53,7 @@ Competitive research/
 │   ├── main.py              # 地図生成、ダッシュボードHTML、PPTX生成を行うメイン処理
 │   └── update_store_db.py   # いかりスーパー既存店の最新情報をスクレイピング・更新するツール
 └── report/                # レポート成果物専用ディレクトリ (Git管理対象)
+    ├── archive/           # 過去日付の成果物アーカイブ
     ├── 202X_XX_XX_competitive_map_within_2km.html
     ├── 202X_XX_XX_competitive_report_within_2km.pptx
     └── ...

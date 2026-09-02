@@ -12,7 +12,7 @@ cd "$WORK_DIR"
 LOG_FILE="$WORK_DIR/auto_runner.log"
 
 # ディレクトリの存在保証
-mkdir -p "$WORK_DIR/report"
+mkdir -p "$WORK_DIR/report/archive"
 
 write_log() {
     local timestamp

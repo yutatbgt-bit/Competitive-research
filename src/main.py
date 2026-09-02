@@ -857,6 +857,40 @@ def main():
     except Exception as e:
         print(f"Error writing last success file: {e}")
 
+    # 過去日付の成果物を report/archive/ へ自動整理
+    archive_old_reports(report_dir="report", current_date_str=today_str)
+
+
+def archive_old_reports(report_dir="report", current_date_str=""):
+    """
+    当日の日付（current_date_str）以外の過去の成果物（HTML, PPTX）を
+    report/archive/ ディレクトリに移動・整理する
+    """
+    import shutil
+    archive_dir = os.path.join(report_dir, "archive")
+    os.makedirs(archive_dir, exist_ok=True)
+    
+    if not os.path.exists(report_dir):
+        return
+        
+    for fname in os.listdir(report_dir):
+        if fname in ("archive", ".gitkeep") or fname.endswith(".md"):
+            continue
+            
+        full_path = os.path.join(report_dir, fname)
+        if not os.path.isfile(full_path):
+            continue
+            
+        # YYYY_MM_DD_... 形式の成果物で、今日の日付以外のものをアーカイブ
+        match = re.match(r"^(\d{4}_\d{2}_\d{2})_competitive_.*?\.(html|pptx|png)$", fname)
+        if match:
+            file_date = match.group(1)
+            if file_date != current_date_str:
+                dest_path = os.path.join(archive_dir, fname)
+                shutil.move(full_path, dest_path)
+                print(f"Archived past report: {fname} -> archive/{fname}")
+
 
 if __name__ == "__main__":
     main()
+
