@@ -157,7 +157,7 @@ def generate_report(mode="within_2km"):
 
     # API呼び出し部分 (リトライとモデルのフォールバックを導入)
     import time
-    models_to_try = ["gemini-2.5-flash", "gemini-2.0-flash"]
+    models_to_try = ["gemini-2.5-flash", "gemini-3.6-flash"]
     max_retries_per_model = 4
     response = None
     success = False
