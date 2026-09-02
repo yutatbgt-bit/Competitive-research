@@ -74,13 +74,30 @@ uv sync
 ```
 
 ### 2. 環境変数の設定
-`.env` ファイルを作成し、Gemini APIキーを設定します。
+`.env.example` をコピーして `.env` を作成し、Gemini APIキーを設定します。
+
+```bash
+cp .env.example .env
+```
 
 ```env
 GEMINI_API_KEY=あなたのGemini_APIキー
 ```
 
-### 3. 定期実行タスクのテスト
+### 3. 定期実行タスクの登録（タスクスケジューラ）
+毎日AM 5:00に自動実行されるタスクをWindowsタスクスケジューラに登録します。
+
+**WSL側から登録する場合:**
+```bash
+bash scripts/register_task.sh
+```
+
+**Windows側から登録する場合 (PowerShell / バッチ):**
+- `scripts/register_task.bat` をダブルクリック、または PowerShell で `scripts/register_task.ps1` を実行。
+
+※ タスク登録を解除したい場合は、`bash scripts/unregister_task.sh` または `scripts/unregister_task.bat` を実行してください。
+
+### 4. 定期実行タスクの手動テスト
 WSL上のタスクランナーを手動実行してテストすることができます。
 
 ```bash

@@ -4,7 +4,9 @@
 
 set -e
 
-WORK_DIR="/home/yuta/project/store-tools/Competitive research"
+# スクリプト自身の配置場所からプロジェクトルートを動的に特定
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORK_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$WORK_DIR"
 
 LOG_FILE="$WORK_DIR/auto_runner.log"
@@ -70,7 +72,7 @@ try_run() {
     write_log "Online detected. Updating report (within_2km) via AI..."
     
     # パスを通す（uvコマンドがインストールされていると想定されるパスを追加）
-    export PATH="$HOME/.local/bin:$PATH"
+    export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:$PATH"
 
     if ! uv run src/update_report.py --mode within_2km >> "$LOG_FILE" 2>&1; then
         write_log "Error: update_report.py --mode within_2km failed. Exiting."
@@ -100,9 +102,12 @@ try_run() {
         
         # Git操作
         git add data/stores_db.json last_success.txt report/
-        git commit -m "chore: automatic daily report generation (2km & no limit)"
-        
-        write_log "Git commit completed. Exiting."
+        if git diff --cached --quiet; then
+            write_log "No changes to commit. Exiting."
+        else
+            git commit -m "chore: automatic daily report generation (2km & no limit)"
+            write_log "Git commit completed. Exiting."
+        fi
     else
         write_log "Error: uv run main.py --mode no_limit failed."
         return 1
