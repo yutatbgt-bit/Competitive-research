@@ -797,25 +797,58 @@
 
       // Impact Analysis
       if(REPORT_DATA.impact_analysis) {
-        const lines = REPORT_DATA.impact_analysis.split('\n');
-        let html = '';
-        let currentIdx = 0;
+        const rawText = REPORT_DATA.impact_analysis.trim();
+        let cards = [];
+        const lines = rawText.split('\n');
+        let currentCard = null;
+
         lines.forEach(l => {
-          if(l.match(/^\d+\./)) {
-            const name = l.replace(/^\d+\.\s*/, '').replace(/\*/g, '');
-            let coordsStr = 'null';
-            if(STORES_DATA && STORES_DATA.ikari_stores) {
-              const info = STORES_DATA.ikari_stores[name.replace('いかり', '') + '店'] || STORES_DATA.ikari_stores[name];
-              if(info) coordsStr = JSON.stringify(info.coords);
+          const trimmed = l.trim();
+          if(!trimmed) return;
+          
+          // ヘッダー判定 (1. 店舗名, 1) 店舗名, * **店舗名**, - **店舗名** など)
+          const numMatch = trimmed.match(/^(\d+[\.\)]|\*+\s*\*\*|\-+\s*\*\*)\s*(.+?)(?:\*\*|：|:|$)(.*)/);
+          if(numMatch) {
+            if(currentCard) cards.push(currentCard);
+            const title = numMatch[2].replace(/\*/g, '').trim();
+            const rest = numMatch[3] ? numMatch[3].replace(/^[:：\s]+/, '').trim() : '';
+            currentCard = { title: title, bullets: [] };
+            if(rest) currentCard.bullets.push(rest);
+          } else if(trimmed.startsWith('*') || trimmed.startsWith('-')) {
+            const content = trimmed.replace(/^[*\\-]\s*/, '').trim();
+            if(currentCard) {
+              currentCard.bullets.push(content);
+            } else {
+              currentCard = { title: '全体への影響', bullets: [content] };
             }
-            html += `<div class="influence-card" id="impact-card-${currentIdx}" onclick="selectCard(${currentIdx}, ${escapeHtml(coordsStr)})"><div class="card-header">${escapeHtml(name)}</div><div class="card-body">`;
-            currentIdx++;
-          } else if(l.trim().startsWith('*')) {
-            html += `<p style="margin-top:6px;">&bull; ${escapeHtml(l.replace(/^[*\\-]\s*/, ''))}</p>`;
+          } else {
+            if(currentCard) {
+              currentCard.bullets.push(trimmed);
+            } else {
+              currentCard = { title: '店舗別影響分析', bullets: [trimmed] };
+            }
           }
-          if(l.trim() === '' && currentIdx > 0) {
-            html += `</div></div>`;
+        });
+        if(currentCard) cards.push(currentCard);
+
+        let html = '';
+        cards.forEach((card, idx) => {
+          let coordsStr = 'null';
+          if(STORES_DATA && STORES_DATA.ikari_stores) {
+            // 店舗名から座標を検索
+            for(let storeName in STORES_DATA.ikari_stores) {
+              if(card.title.includes(storeName) || card.title.replace('いかり', '').includes(storeName.replace('いかり', ''))) {
+                coordsStr = JSON.stringify(STORES_DATA.ikari_stores[storeName].coords);
+                break;
+              }
+            }
           }
+          html += `<div class="influence-card" id="impact-card-${idx}" onclick="selectCard(${idx}, ${escapeHtml(coordsStr)})">
+            <div class="card-header">${escapeHtml(card.title)}</div>
+            <div class="card-body">
+              ${card.bullets.map(b => `<p style="margin-top:6px;">&bull; ${escapeHtml(b)}</p>`).join('')}
+            </div>
+          </div>`;
         });
         document.getElementById('influence-cards-container').innerHTML = html;
       }
